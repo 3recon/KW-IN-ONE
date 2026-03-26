@@ -443,19 +443,12 @@ async function loadDiningMenus() {
 function parseDiningMenus(html, now) {
   const parser = new DOMParser();
   const doc = parser.parseFromString(html, "text/html");
-  const text = (doc.body.innerText || doc.body.textContent || "").replace(/\r/g, "");
-  const lines = text
-    .split("\n")
-    .map((line) => line.trim())
-    .filter((line, index, array) => line || array[index - 1]);
+  const targetColumnIndex = getDiningColumnIndex(now);
+  const table = findDiningTable(doc);
 
-  const dates = extractDiningDates(lines);
-  const targetDate = formatDate(now);
-  const dateIndex = dates.indexOf(targetDate);
-
-  if (dateIndex === -1) {
+  if (!table || targetColumnIndex === -1) {
     return {
-      date: targetDate,
+      date: formatDate(now),
       focusLabel: "운영 정보 없음",
       entries: [
         {
@@ -467,110 +460,90 @@ function parseDiningMenus(html, now) {
     };
   }
 
-  const sections = [
-    { marker: "광운대 함지마루천원의 아침", name: "천원의 아침", time: "08:30 ~ 09:30" },
-    { marker: "광운대 함지마루 자율중식", name: "자율중식", time: "11:30 ~ 14:00" },
-    { marker: "광운대 함지마루 푸드코트", name: "푸드코트", time: "11:30 ~ 14:00" }
-  ];
+  const rows = [...table.querySelectorAll("tr")];
+  const dataRows = rows.slice(1);
 
-  const entries = sections
-    .map((section, sectionIndex) => {
-      const start = lines.findIndex((line) => line.includes(section.marker));
-      if (start === -1) {
-        return null;
-      }
-
-      const nextSection = sections[sectionIndex + 1];
-      const end = nextSection
-        ? lines.findIndex((line, index) => index > start && line.includes(nextSection.marker))
-        : lines.findIndex((line, index) => index > start && line.includes("담당부서"));
-      const slice = lines.slice(start, end === -1 ? undefined : end);
-      const groups = splitMenuGroups(slice);
-      const items = groups[dateIndex] || [];
-
-      return {
-        name: section.name,
-        time: section.time,
-        items: items.length ? items : ["운영 정보 없음"]
-      };
-    })
+  const entries = dataRows
+    .map((row) => parseDiningRow(row, targetColumnIndex))
     .filter(Boolean);
 
   return {
-    date: targetDate,
+    date: formatDate(now),
     focusLabel: pickMealLabel(now),
     entries
   };
 }
 
-function extractDiningDates(lines) {
-  const headerStart = lines.findIndex((line) => line.includes("식단안내 구분"));
-  const firstSection = lines.findIndex((line) => line.includes("광운대 함지마루천원의 아침"));
-
-  if (headerStart !== -1 && firstSection !== -1 && firstSection > headerStart) {
-    const headerLines = lines.slice(headerStart, firstSection);
-    const headerText = headerLines.join(" ");
-    const headerDates = headerText.match(/\d{4}-\d{2}-\d{2}/g) || [];
-
-    if (headerDates.length) {
-      return headerDates;
-    }
-  }
-
-  const dates = [];
-
-  for (const line of lines) {
-    const matches = line.match(/\d{4}-\d{2}-\d{2}/g);
-    if (!matches) {
-      continue;
-    }
-
-    matches.forEach((date) => {
-      if (!dates.includes(date)) {
-        dates.push(date);
-      }
-    });
-
-    if (dates.length >= 5) {
-      break;
-    }
-  }
-
-  return dates;
+function findDiningTable(doc) {
+  const tables = [...doc.querySelectorAll("table")];
+  return (
+    tables.find((table) => {
+      const text = table.textContent || "";
+      return (
+        text.includes("광운대 함지마루") &&
+        text.includes("천원의 아침") &&
+        text.includes("자율중식")
+      );
+    }) || null
+  );
 }
 
-function splitMenuGroups(sectionLines) {
-  const cleanedLines = sectionLines
-    .filter(
-      (line) =>
-        !line.includes("판매시간") &&
-        !line.includes("(1,000원)") &&
-        !line.includes("(6,000원)") &&
-        !line.includes("(5,500~7000원)") &&
-        !/^\d{1,2}:\d{2}\s*~\s*\d{1,2}:\d{2}$/.test(line) &&
-        !line.startsWith("광운대 함지마루")
-    );
+function parseDiningRow(row, targetColumnIndex) {
+  const cells = [...row.querySelectorAll("th, td")];
 
-  const groups = [];
-  let currentGroup = [];
-
-  cleanedLines.forEach((line) => {
-    if (!line) {
-      if (currentGroup.length) {
-        groups.push(currentGroup);
-        currentGroup = [];
-      }
-      return;
-    }
-
-    currentGroup.push(line);
-  });
-
-  if (currentGroup.length) {
-    groups.push(currentGroup);
+  if (cells.length <= targetColumnIndex) {
+    return null;
   }
 
-  return groups;
+  const infoCell = cells[0];
+  const menuCell = cells[targetColumnIndex];
+  const infoText = normalizeCellText(infoCell.innerText || infoCell.textContent || "");
+  const menuLines = splitCellLines(menuCell.innerText || menuCell.textContent || "");
+
+  if (!infoText || !menuLines.length) {
+    return null;
+  }
+
+  return {
+    name: parseDiningName(infoText),
+    time: parseDiningTime(infoText),
+    items: menuLines
+  };
+}
+
+function normalizeCellText(value) {
+  return value.replace(/\r/g, "").replace(/\n+/g, "\n").trim();
+}
+
+function splitCellLines(value) {
+  return value
+    .replace(/\r/g, "")
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean);
+}
+
+function parseDiningName(infoText) {
+  const firstLine = infoText.split("\n")[0] || "";
+  return firstLine
+    .replace("광운대 함지마루", "")
+    .replace(/\(.*?\)/g, "")
+    .trim();
+}
+
+function parseDiningTime(infoText) {
+  const match = infoText.match(/\d{1,2}:\d{2}\s*~\s*\d{1,2}:\d{2}/);
+  return match ? match[0] : "운영시간 미정";
+}
+
+function getDiningColumnIndex(now) {
+  const weekday = getKoreaWeekday(now);
+
+  if (weekday < 1 || weekday > 5) {
+    return -1;
+  }
+
+  return weekday;
 }
 
 function pickMealLabel(now) {
@@ -614,4 +587,23 @@ function getKoreaHour(date) {
   });
 
   return Number(formatter.format(date));
+}
+
+function getKoreaWeekday(date) {
+  const weekdayText = new Intl.DateTimeFormat("en-US", {
+    timeZone: "Asia/Seoul",
+    weekday: "short"
+  }).format(date);
+
+  const map = {
+    Mon: 1,
+    Tue: 2,
+    Wed: 3,
+    Thu: 4,
+    Fri: 5,
+    Sat: 6,
+    Sun: 0
+  };
+
+  return map[weekdayText] ?? -1;
 }
