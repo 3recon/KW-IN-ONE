@@ -1,5 +1,4 @@
 const DEFAULT_SETTINGS = {
-  notificationsEnabled: true,
   refreshMinutes: 30,
   pinnedLinks: ["klas", "kw-home", "e-learning", "webmail"],
   selectedNoticeCategories: ["전체"]
@@ -25,22 +24,8 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
   if (alarm.name !== "refreshNotices") {
     return;
   }
-
-  const { notificationsEnabled } = await chrome.storage.sync.get("notificationsEnabled");
   const updatedAt = new Date().toISOString();
   await chrome.storage.local.set({ lastRefreshAt: updatedAt });
-
-  if (!notificationsEnabled) {
-    return;
-  }
-
-  chrome.notifications.create({
-    type: "basic",
-    iconUrl:
-      "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9p4fNwAAAABJRU5ErkJggg==",
-    title: "KW IN ONE",
-    message: "공지 새로고침이 실행되었습니다."
-  });
 });
 
 async function ensureRefreshAlarm(refreshMinutes) {

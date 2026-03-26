@@ -12,7 +12,6 @@ const NOTICE_URL =
   "https://www.kw.ac.kr/ko/life/notice.jsp?srCategoryId=&mode=list&searchKey=1&searchVal=";
 
 const DEFAULT_SETTINGS = {
-  notificationsEnabled: true,
   refreshMinutes: 30,
   selectedNoticeCategories: ["전체"]
 };
@@ -233,7 +232,6 @@ function bindCategorySelectionRules() {
 
 async function loadSettings() {
   const settings = await chrome.storage.sync.get(DEFAULT_SETTINGS);
-  document.getElementById("notificationsEnabled").checked = settings.notificationsEnabled;
   document.getElementById("refreshMinutes").value = settings.refreshMinutes;
   applySelectedCategories(settings.selectedNoticeCategories);
 }
@@ -253,7 +251,6 @@ function applySelectedCategories(selectedCategories) {
 }
 
 async function saveSettings() {
-  const notificationsEnabled = document.getElementById("notificationsEnabled").checked;
   const refreshMinutes =
     Number(document.getElementById("refreshMinutes").value) || DEFAULT_SETTINGS.refreshMinutes;
   const selectedNoticeCategories = normalizeSelectedCategories(
@@ -263,7 +260,6 @@ async function saveSettings() {
   );
 
   await chrome.storage.sync.set({
-    notificationsEnabled,
     refreshMinutes,
     selectedNoticeCategories
   });
