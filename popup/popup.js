@@ -27,7 +27,7 @@ const SAMPLE_NOTICES = [
   {
     source: "광운대 공지",
     category: "학사",
-    title: "설정 패널에서 필요한 카테고리만 선택할 수 있습니다.",
+    title: "설정 화면에서 필요한 카테고리만 선택할 수 있습니다.",
     url: NOTICE_URL,
     publishedAt: "MVP"
   },
@@ -54,11 +54,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   bindEvents();
   await loadSettings();
   await loadLatestNotices();
-
-  const { lastRefreshAt } = await chrome.storage.local.get("lastRefreshAt");
-  if (lastRefreshAt) {
-    appendRefreshNotice(lastRefreshAt);
-  }
 });
 
 function renderQuickLinks() {
@@ -182,13 +177,6 @@ function bindEvents() {
     chrome.tabs.create({ url: "https://www.kw.ac.kr/ko/life/facility11.jsp" });
   });
 
-  document.getElementById("refreshNotices").addEventListener("click", async () => {
-    const refreshedAt = new Date().toLocaleString("ko-KR");
-    await chrome.storage.local.set({ lastRefreshAt: refreshedAt });
-    await loadLatestNotices();
-    appendRefreshNotice(refreshedAt);
-  });
-
   document.getElementById("saveSettings").addEventListener("click", saveSettings);
   bindCategorySelectionRules();
 }
@@ -271,27 +259,6 @@ function normalizeSelectedCategories(categories) {
   }
 
   return categories;
-}
-
-function appendRefreshNotice(refreshedAt) {
-  const list = document.getElementById("noticeList");
-  const first = list.querySelector(".notice-item");
-
-  if (!first) {
-    return;
-  }
-
-  const existing = document.getElementById("refreshStamp");
-  if (existing) {
-    existing.textContent = `마지막 새로고침: ${refreshedAt}`;
-    return;
-  }
-
-  const stamp = document.createElement("div");
-  stamp.id = "refreshStamp";
-  stamp.className = "notice-date";
-  stamp.textContent = `마지막 새로고침: ${refreshedAt}`;
-  first.appendChild(stamp);
 }
 
 async function loadLatestNotices() {
