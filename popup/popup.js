@@ -232,7 +232,6 @@ function bindCategorySelectionRules() {
 
 async function loadSettings() {
   const settings = await chrome.storage.sync.get(DEFAULT_SETTINGS);
-  document.getElementById("refreshMinutes").value = settings.refreshMinutes;
   applySelectedCategories(settings.selectedNoticeCategories);
 }
 
@@ -251,8 +250,6 @@ function applySelectedCategories(selectedCategories) {
 }
 
 async function saveSettings() {
-  const refreshMinutes =
-    Number(document.getElementById("refreshMinutes").value) || DEFAULT_SETTINGS.refreshMinutes;
   const selectedNoticeCategories = normalizeSelectedCategories(
     [...document.querySelectorAll('input[name="noticeCategory"]:checked')].map(
       (checkbox) => checkbox.value
@@ -260,7 +257,7 @@ async function saveSettings() {
   );
 
   await chrome.storage.sync.set({
-    refreshMinutes,
+    refreshMinutes: DEFAULT_SETTINGS.refreshMinutes,
     selectedNoticeCategories
   });
 
