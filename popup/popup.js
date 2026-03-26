@@ -159,7 +159,6 @@ function renderMealSection(mealState) {
             ${entry.name}
             <span class="meal-time">(${entry.time})</span>
           </span>
-          <div class="notice-date">${mealState.date}</div>
           <span>${entry.items.length ? entry.items.join(" · ") : "운영 정보 없음"}</span>
         </div>
       `
