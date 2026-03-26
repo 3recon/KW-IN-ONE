@@ -251,6 +251,7 @@ async function saveSettings() {
 
   document.getElementById("settingsStatus").textContent = "설정이 저장되었습니다.";
   await loadLatestNotices();
+  document.getElementById("settingsPanel").classList.add("is-collapsed");
 }
 
 function normalizeSelectedCategories(categories) {
