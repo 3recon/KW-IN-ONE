@@ -94,7 +94,8 @@ h2 {
 .link-card {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  justify-content: center;
+  min-height: 72px;
   padding: 12px;
   border: 1px solid var(--line);
   border-radius: 14px;
@@ -112,12 +113,7 @@ h2 {
 .link-title {
   font-size: 14px;
   font-weight: 700;
-}
-
-.link-url {
-  font-size: 11px;
-  color: var(--muted);
-  word-break: break-all;
+  line-height: 1.35;
 }
 
 .notice-list,

@@ -71,7 +71,6 @@ function renderQuickLinks() {
     anchor.rel = "noreferrer";
     anchor.innerHTML = `
       <span class="link-title">${link.title}</span>
-      <span class="link-url">${link.url}</span>
     `;
     container.appendChild(anchor);
   });
