@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KW IN ONE</title>
+    <link rel="stylesheet" href="popup.css">
+  </head>
+  <body>
+    <main class="app">
+      <header class="hero">
+        <p class="eyebrow">Kwangwoon University</p>
+        <h1>KW IN ONE</h1>
+        <p class="subtitle">학사, 생활, 공지를 한 번에 확인하는 팝업 대시보드</p>
+      </header>
+
+      <section class="panel">
+        <div class="section-header">
+          <h2>바로가기</h2>
+          <span class="muted">자주 쓰는 서비스</span>
+        </div>
+        <div class="link-grid" id="quickLinks"></div>
+      </section>
+
+      <section class="panel">
+        <div class="section-header">
+          <h2>통합 공지</h2>
+          <button id="refreshNotices" class="ghost-button" type="button">새로고침</button>
+        </div>
+        <ul class="notice-list" id="noticeList"></ul>
+      </section>
+
+      <section class="panel meal-panel">
+        <div class="section-header">
+          <h2>오늘의 학식</h2>
+          <span class="pill" id="mealLabel"></span>
+        </div>
+        <div id="mealSummary" class="meal-summary"></div>
+        <button id="openDiningPage" class="ghost-button full-width" type="button">학식 페이지 열기</button>
+      </section>
+
+      <section class="panel">
+        <div class="section-header">
+          <h2>전화번호부</h2>
+          <span class="muted">자주 찾는 부서</span>
+        </div>
+        <label class="select-label" for="phonebookCategory">카테고리 선택</label>
+        <select id="phonebookCategory" class="select"></select>
+        <ul class="phone-list" id="phoneList"></ul>
+      </section>
+    </main>
+
+    <script src="../data/phonebook.js"></script>
+    <script src="popup.js"></script>
+  </body>
+</html>
