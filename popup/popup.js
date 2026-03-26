@@ -155,8 +155,7 @@ function renderMealSection(mealState) {
     .map(
       (entry) => `
         <div class="meal-card">
-          <strong>${entry.name}</strong>
-          <div class="notice-date">${mealState.date} · ${entry.time}</div>
+          <span class="meal-heading">${entry.name} ${mealState.date} · ${entry.time}</span>
           <span>${entry.items.length ? entry.items.join(" · ") : "운영 정보 없음"}</span>
         </div>
       `

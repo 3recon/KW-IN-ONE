@@ -190,6 +190,13 @@ h2 {
   margin-bottom: 6px;
 }
 
+.meal-heading {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
 .ghost-button,
 .select,
 .primary-button {
