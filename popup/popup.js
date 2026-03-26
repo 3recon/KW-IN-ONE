@@ -10,6 +10,7 @@ const QUICK_LINKS = [
 
 const NOTICE_URL =
   "https://www.kw.ac.kr/ko/life/notice.jsp?srCategoryId=&mode=list&searchKey=1&searchVal=";
+const DINING_URL = "https://www.kw.ac.kr/ko/life/facility11.jsp";
 
 const DEFAULT_SETTINGS = {
   refreshMinutes: 30,
@@ -41,19 +42,30 @@ const SAMPLE_NOTICES = [
 ];
 
 const SAMPLE_MEALS = {
-  breakfast: ["토스트", "스크램블 에그", "샐러드"],
-  lunch: ["제육볶음", "된장국", "김치", "쌀밥"],
-  dinner: ["돈까스", "우동", "단무지", "샐러드"]
+  date: "오늘",
+  focusLabel: "예시 식단",
+  entries: [
+    {
+      name: "천원의 아침",
+      time: "08:30 ~ 09:30",
+      items: ["토스트", "스크램블 에그", "샐러드"]
+    },
+    {
+      name: "자율중식",
+      time: "11:30 ~ 14:00",
+      items: ["제육볶음", "된장국", "김치", "쌀밥"]
+    }
+  ]
 };
 
 document.addEventListener("DOMContentLoaded", async () => {
   renderQuickLinks();
-  renderMealSection();
-  renderPhonebook(window.KW_PHONEBOOK || []);
   renderCategoryOptions(window.KW_NOTICE_CATEGORIES || []);
+  renderPhonebook(window.KW_PHONEBOOK || []);
+  renderMealSection(SAMPLE_MEALS);
   bindEvents();
   await loadSettings();
-  await loadLatestNotices();
+  await Promise.all([loadLatestNotices(), loadDiningMenus()]);
 });
 
 function renderQuickLinks() {
@@ -71,54 +83,19 @@ function renderQuickLinks() {
   });
 }
 
-function renderNotices(notices) {
-  const list = document.getElementById("noticeList");
-  list.innerHTML = "";
+function renderCategoryOptions(categories) {
+  const container = document.getElementById("categoryList");
+  container.innerHTML = "";
 
-  notices.forEach((notice) => {
-    const item = document.createElement("li");
-    item.className = "notice-item";
-    item.innerHTML = `
-      <span class="notice-source">${notice.source} · ${notice.category}</span>
-      <a class="notice-link" href="${notice.url}" target="_blank" rel="noreferrer">${notice.title}</a>
-      <div class="notice-date">${notice.publishedAt}</div>
+  categories.forEach((category) => {
+    const label = document.createElement("label");
+    label.className = "category-item";
+    label.innerHTML = `
+      <input type="checkbox" name="noticeCategory" value="${category}">
+      <span>${category}</span>
     `;
-    list.appendChild(item);
+    container.appendChild(label);
   });
-}
-
-function renderMealSection() {
-  const { label, items } = getCurrentMeal();
-  const labelNode = document.getElementById("mealLabel");
-  const summaryNode = document.getElementById("mealSummary");
-
-  labelNode.textContent = label;
-  summaryNode.innerHTML = `
-    <div class="meal-card">
-      <strong>${label}</strong>
-      <span>${items.join(" · ")}</span>
-    </div>
-    <div class="meal-card">
-      <strong>오늘 전체 식단</strong>
-      <span>아침 ${SAMPLE_MEALS.breakfast.join(", ")}</span><br>
-      <span>점심 ${SAMPLE_MEALS.lunch.join(", ")}</span><br>
-      <span>저녁 ${SAMPLE_MEALS.dinner.join(", ")}</span>
-    </div>
-  `;
-}
-
-function getCurrentMeal() {
-  const hour = new Date().getHours();
-
-  if (hour < 10) {
-    return { label: "오늘 아침", items: SAMPLE_MEALS.breakfast };
-  }
-
-  if (hour < 15) {
-    return { label: "오늘 점심", items: SAMPLE_MEALS.lunch };
-  }
-
-  return { label: "오늘 저녁", items: SAMPLE_MEALS.dinner };
 }
 
 function renderPhonebook(entries) {
@@ -153,19 +130,38 @@ function drawPhoneList(entries, category) {
     });
 }
 
-function renderCategoryOptions(categories) {
-  const container = document.getElementById("categoryList");
-  container.innerHTML = "";
+function renderNotices(notices) {
+  const list = document.getElementById("noticeList");
+  list.innerHTML = "";
 
-  categories.forEach((category) => {
-    const label = document.createElement("label");
-    label.className = "category-item";
-    label.innerHTML = `
-      <input type="checkbox" name="noticeCategory" value="${category}">
-      <span>${category}</span>
+  notices.forEach((notice) => {
+    const item = document.createElement("li");
+    item.className = "notice-item";
+    item.innerHTML = `
+      <span class="notice-source">${notice.source} · ${notice.category}</span>
+      <a class="notice-link" href="${notice.url}" target="_blank" rel="noreferrer">${notice.title}</a>
+      <div class="notice-date">${notice.publishedAt}</div>
     `;
-    container.appendChild(label);
+    list.appendChild(item);
   });
+}
+
+function renderMealSection(mealState) {
+  const labelNode = document.getElementById("mealLabel");
+  const summaryNode = document.getElementById("mealSummary");
+
+  labelNode.textContent = mealState.focusLabel;
+  summaryNode.innerHTML = mealState.entries
+    .map(
+      (entry) => `
+        <div class="meal-card">
+          <strong>${entry.name}</strong>
+          <div class="notice-date">${mealState.date} · ${entry.time}</div>
+          <span>${entry.items.length ? entry.items.join(" · ") : "운영 정보 없음"}</span>
+        </div>
+      `
+    )
+    .join("");
 }
 
 function bindEvents() {
@@ -174,7 +170,7 @@ function bindEvents() {
   });
 
   document.getElementById("openDiningPage").addEventListener("click", () => {
-    chrome.tabs.create({ url: "https://www.kw.ac.kr/ko/life/facility11.jsp" });
+    chrome.tabs.create({ url: DINING_URL });
   });
 
   document.getElementById("saveSettings").addEventListener("click", saveSettings);
@@ -384,4 +380,168 @@ function extractNearbyDate(anchor) {
   }
 
   return "";
+}
+
+async function loadDiningMenus() {
+  try {
+    const response = await fetch(DINING_URL, { cache: "no-store" });
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+
+    const html = await response.text();
+    const parsedMeals = parseDiningMenus(html, new Date());
+
+    if (!parsedMeals.entries.length) {
+      throw new Error("No dining menu parsed");
+    }
+
+    renderMealSection(parsedMeals);
+    await chrome.storage.local.set({ diningCache: parsedMeals });
+  } catch (error) {
+    const { diningCache } = await chrome.storage.local.get("diningCache");
+    renderMealSection(diningCache?.entries?.length ? diningCache : SAMPLE_MEALS);
+  }
+}
+
+function parseDiningMenus(html, now) {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(html, "text/html");
+  const text = (doc.body.innerText || doc.body.textContent || "").replace(/\r/g, "");
+  const lines = text
+    .split("\n")
+    .map((line) => line.trim())
+    .filter((line, index, array) => line || array[index - 1]);
+
+  const dates = extractDiningDates(lines);
+  const targetDate = formatDate(now);
+  const dateIndex = dates.indexOf(targetDate);
+
+  if (dateIndex === -1) {
+    return {
+      date: targetDate,
+      focusLabel: "운영 정보 없음",
+      entries: [
+        {
+          name: "오늘 식단",
+          time: "학식 페이지 확인",
+          items: ["오늘 날짜에 해당하는 학식 정보가 없습니다."]
+        }
+      ]
+    };
+  }
+
+  const sections = [
+    { marker: "광운대 함지마루천원의 아침", name: "천원의 아침", time: "08:30 ~ 09:30" },
+    { marker: "광운대 함지마루 자율중식", name: "자율중식", time: "11:30 ~ 14:00" },
+    { marker: "광운대 함지마루 푸드코트", name: "푸드코트", time: "11:30 ~ 14:00" }
+  ];
+
+  const entries = sections
+    .map((section, sectionIndex) => {
+      const start = lines.findIndex((line) => line.includes(section.marker));
+      if (start === -1) {
+        return null;
+      }
+
+      const nextSection = sections[sectionIndex + 1];
+      const end = nextSection
+        ? lines.findIndex((line, index) => index > start && line.includes(nextSection.marker))
+        : lines.findIndex((line, index) => index > start && line.includes("담당부서"));
+      const slice = lines.slice(start, end === -1 ? undefined : end);
+      const groups = splitMenuGroups(slice);
+      const items = groups[dateIndex] || [];
+
+      return {
+        name: section.name,
+        time: section.time,
+        items: items.length ? items : ["운영 정보 없음"]
+      };
+    })
+    .filter(Boolean);
+
+  return {
+    date: targetDate,
+    focusLabel: pickMealLabel(now),
+    entries
+  };
+}
+
+function extractDiningDates(lines) {
+  const dates = [];
+
+  for (const line of lines) {
+    const matches = line.match(/\d{4}-\d{2}-\d{2}/g);
+    if (!matches) {
+      continue;
+    }
+
+    matches.forEach((date) => {
+      if (!dates.includes(date)) {
+        dates.push(date);
+      }
+    });
+
+    if (dates.length >= 5) {
+      break;
+    }
+  }
+
+  return dates;
+}
+
+function splitMenuGroups(sectionLines) {
+  const cleanedLines = sectionLines
+    .filter(
+      (line) =>
+        !line.includes("판매시간") &&
+        !line.includes("(1,000원)") &&
+        !line.includes("(6,000원)") &&
+        !line.includes("(5,500~7000원)") &&
+        !/^\d{1,2}:\d{2}\s*~\s*\d{1,2}:\d{2}$/.test(line) &&
+        !line.startsWith("광운대 함지마루")
+    );
+
+  const groups = [];
+  let currentGroup = [];
+
+  cleanedLines.forEach((line) => {
+    if (!line) {
+      if (currentGroup.length) {
+        groups.push(currentGroup);
+        currentGroup = [];
+      }
+      return;
+    }
+
+    currentGroup.push(line);
+  });
+
+  if (currentGroup.length) {
+    groups.push(currentGroup);
+  }
+
+  return groups;
+}
+
+function pickMealLabel(now) {
+  const hour = now.getHours();
+
+  if (hour < 10) {
+    return "오늘 아침";
+  }
+
+  if (hour < 14) {
+    return "오늘 점심";
+  }
+
+  return "오늘 식단";
+}
+
+function formatDate(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
 }
