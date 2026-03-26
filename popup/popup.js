@@ -11,7 +11,9 @@ const QUICK_LINKS = [
 const NOTICE_URL =
   "https://www.kw.ac.kr/ko/life/notice.jsp?srCategoryId=&mode=list&searchKey=1&searchVal=";
 
-const DEFAULT_NOTICE_SETTINGS = {
+const DEFAULT_SETTINGS = {
+  notificationsEnabled: true,
+  refreshMinutes: 30,
   selectedNoticeCategories: ["전체"]
 };
 
@@ -26,7 +28,7 @@ const SAMPLE_NOTICES = [
   {
     source: "광운대 공지",
     category: "학사",
-    title: "옵션 페이지에서 필요한 카테고리만 선택할 수 있습니다.",
+    title: "설정 패널에서 필요한 카테고리만 선택할 수 있습니다.",
     url: NOTICE_URL,
     publishedAt: "MVP"
   },
@@ -47,18 +49,11 @@ const SAMPLE_MEALS = {
 
 document.addEventListener("DOMContentLoaded", async () => {
   renderQuickLinks();
-  renderNotices([
-    {
-      source: "광운대 공지",
-      category: "전체",
-      title: "공지사항을 불러오는 중입니다.",
-      url: NOTICE_URL,
-      publishedAt: ""
-    }
-  ]);
   renderMealSection();
   renderPhonebook(window.KW_PHONEBOOK || []);
+  renderCategoryOptions(window.KW_NOTICE_CATEGORIES || []);
   bindEvents();
+  await loadSettings();
   await loadLatestNotices();
 
   const { lastRefreshAt } = await chrome.storage.local.get("lastRefreshAt");
@@ -164,7 +159,26 @@ function drawPhoneList(entries, category) {
     });
 }
 
+function renderCategoryOptions(categories) {
+  const container = document.getElementById("categoryList");
+  container.innerHTML = "";
+
+  categories.forEach((category) => {
+    const label = document.createElement("label");
+    label.className = "category-item";
+    label.innerHTML = `
+      <input type="checkbox" name="noticeCategory" value="${category}">
+      <span>${category}</span>
+    `;
+    container.appendChild(label);
+  });
+}
+
 function bindEvents() {
+  document.getElementById("toggleSettings").addEventListener("click", () => {
+    document.getElementById("settingsPanel").classList.toggle("is-collapsed");
+  });
+
   document.getElementById("openDiningPage").addEventListener("click", () => {
     chrome.tabs.create({ url: "https://www.kw.ac.kr/ko/life/facility11.jsp" });
   });
@@ -175,6 +189,95 @@ function bindEvents() {
     await loadLatestNotices();
     appendRefreshNotice(refreshedAt);
   });
+
+  document.getElementById("saveSettings").addEventListener("click", saveSettings);
+  bindCategorySelectionRules();
+}
+
+function bindCategorySelectionRules() {
+  const categoryCheckboxes = [...document.querySelectorAll('input[name="noticeCategory"]')];
+  const allCheckbox = categoryCheckboxes.find((checkbox) => checkbox.value === "전체");
+
+  if (!allCheckbox) {
+    return;
+  }
+
+  allCheckbox.addEventListener("change", () => {
+    if (!allCheckbox.checked) {
+      return;
+    }
+
+    categoryCheckboxes.forEach((checkbox) => {
+      checkbox.checked = checkbox.value === "전체";
+    });
+  });
+
+  categoryCheckboxes
+    .filter((checkbox) => checkbox.value !== "전체")
+    .forEach((checkbox) => {
+      checkbox.addEventListener("change", () => {
+        if (checkbox.checked) {
+          allCheckbox.checked = false;
+        }
+
+        const checkedSpecific = categoryCheckboxes.some(
+          (item) => item.value !== "전체" && item.checked
+        );
+
+        if (!checkedSpecific) {
+          allCheckbox.checked = true;
+        }
+      });
+    });
+}
+
+async function loadSettings() {
+  const settings = await chrome.storage.sync.get(DEFAULT_SETTINGS);
+  document.getElementById("notificationsEnabled").checked = settings.notificationsEnabled;
+  document.getElementById("refreshMinutes").value = settings.refreshMinutes;
+  applySelectedCategories(settings.selectedNoticeCategories);
+}
+
+function applySelectedCategories(selectedCategories) {
+  const categoryCheckboxes = [...document.querySelectorAll('input[name="noticeCategory"]')];
+  const useAll = !selectedCategories.length || selectedCategories.includes("전체");
+
+  categoryCheckboxes.forEach((checkbox) => {
+    if (useAll) {
+      checkbox.checked = checkbox.value === "전체";
+      return;
+    }
+
+    checkbox.checked = selectedCategories.includes(checkbox.value);
+  });
+}
+
+async function saveSettings() {
+  const notificationsEnabled = document.getElementById("notificationsEnabled").checked;
+  const refreshMinutes =
+    Number(document.getElementById("refreshMinutes").value) || DEFAULT_SETTINGS.refreshMinutes;
+  const selectedNoticeCategories = normalizeSelectedCategories(
+    [...document.querySelectorAll('input[name="noticeCategory"]:checked')].map(
+      (checkbox) => checkbox.value
+    )
+  );
+
+  await chrome.storage.sync.set({
+    notificationsEnabled,
+    refreshMinutes,
+    selectedNoticeCategories
+  });
+
+  document.getElementById("settingsStatus").textContent = "설정이 저장되었습니다.";
+  await loadLatestNotices();
+}
+
+function normalizeSelectedCategories(categories) {
+  if (!categories.length || categories.includes("전체")) {
+    return ["전체"];
+  }
+
+  return categories;
 }
 
 function appendRefreshNotice(refreshedAt) {
@@ -208,7 +311,7 @@ async function loadLatestNotices() {
 
     const html = await response.text();
     const rawNotices = parseKwNotices(html);
-    const settings = await chrome.storage.sync.get(DEFAULT_NOTICE_SETTINGS);
+    const settings = await chrome.storage.sync.get(DEFAULT_SETTINGS);
     const filteredNotices = filterNoticesByCategory(
       rawNotices,
       settings.selectedNoticeCategories

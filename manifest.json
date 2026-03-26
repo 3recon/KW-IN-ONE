@@ -18,6 +18,5 @@
   "action": {
     "default_title": "KW IN ONE",
     "default_popup": "popup/popup.html"
-  },
-  "options_page": "options/options.html"
+  }
 }
