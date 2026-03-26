@@ -401,6 +401,9 @@ function extractNearbyDate(anchor) {
 }
 
 async function loadDiningMenus() {
+  const today = getKoreaToday();
+  const targetDate = formatDate(today);
+
   try {
     const response = await fetch(DINING_URL, { cache: "no-store" });
 
@@ -409,17 +412,31 @@ async function loadDiningMenus() {
     }
 
     const html = await response.text();
-    const parsedMeals = parseDiningMenus(html, getKoreaToday());
+    const parsedMeals = parseDiningMenus(html, today);
 
     if (!parsedMeals.entries.length) {
       throw new Error("No dining menu parsed");
     }
 
     renderMealSection(parsedMeals);
-    await chrome.storage.local.set({ diningCache: parsedMeals });
+    await chrome.storage.local.set({
+      diningCache: {
+        ...parsedMeals,
+        targetDate
+      }
+    });
   } catch (error) {
     const { diningCache } = await chrome.storage.local.get("diningCache");
-    renderMealSection(diningCache?.entries?.length ? diningCache : SAMPLE_MEALS);
+
+    if (diningCache?.entries?.length && diningCache.targetDate === targetDate) {
+      renderMealSection(diningCache);
+      return;
+    }
+
+    renderMealSection({
+      ...SAMPLE_MEALS,
+      focusLabel: "오늘 식단 확인 실패"
+    });
   }
 }
 
