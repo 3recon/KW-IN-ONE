@@ -487,6 +487,19 @@ function parseDiningMenus(html, now) {
 }
 
 function extractDiningDates(lines) {
+  const headerStart = lines.findIndex((line) => line.includes("식단안내 구분"));
+  const firstSection = lines.findIndex((line) => line.includes("광운대 함지마루천원의 아침"));
+
+  if (headerStart !== -1 && firstSection !== -1 && firstSection > headerStart) {
+    const headerLines = lines.slice(headerStart, firstSection);
+    const headerText = headerLines.join(" ");
+    const headerDates = headerText.match(/\d{4}-\d{2}-\d{2}/g) || [];
+
+    if (headerDates.length) {
+      return headerDates;
+    }
+  }
+
   const dates = [];
 
   for (const line of lines) {
