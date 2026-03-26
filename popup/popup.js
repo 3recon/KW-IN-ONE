@@ -159,11 +159,27 @@ function renderMealSection(mealState) {
             ${entry.name}
             <span class="meal-time">(${entry.time})</span>
           </span>
-          <span>${entry.items.length ? entry.items.join(" · ") : "운영 정보 없음"}</span>
+          <div class="meal-items">
+            ${renderMealLines(entry.items)}
+          </div>
         </div>
       `
     )
     .join("");
+}
+
+function renderMealLines(items) {
+  if (!items.length) {
+    return "<span>운영 정보 없음</span>";
+  }
+
+  const lines = [];
+
+  for (let index = 0; index < items.length; index += 3) {
+    lines.push(`<span>${items.slice(index, index + 3).join(" · ")}</span>`);
+  }
+
+  return lines.join("");
 }
 
 function bindEvents() {

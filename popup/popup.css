@@ -203,6 +203,11 @@ h2 {
   color: #d9d9d9;
 }
 
+.meal-items {
+  display: grid;
+  gap: 4px;
+}
+
 .ghost-button,
 .select,
 .primary-button {
