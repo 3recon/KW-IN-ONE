@@ -1,7 +1,8 @@
 const DEFAULT_SETTINGS = {
   notificationsEnabled: true,
   refreshMinutes: 30,
-  pinnedLinks: ["klas", "kw-home", "e-learning", "webmail"]
+  pinnedLinks: ["klas", "kw-home", "e-learning", "webmail"],
+  selectedNoticeCategories: ["전체"]
 };
 
 chrome.runtime.onInstalled.addListener(async () => {

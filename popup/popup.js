@@ -11,24 +11,31 @@ const QUICK_LINKS = [
 const NOTICE_URL =
   "https://www.kw.ac.kr/ko/life/notice.jsp?srCategoryId=&mode=list&searchKey=1&searchVal=";
 
+const DEFAULT_NOTICE_SETTINGS = {
+  selectedNoticeCategories: ["전체"]
+};
+
 const SAMPLE_NOTICES = [
   {
-    source: "광운대 홈페이지",
-    title: "공지 수집 어댑터 연결 전까지는 예시 공지가 표시됩니다.",
+    source: "광운대 공지",
+    category: "일반",
+    title: "공지사항을 불러오지 못해 예시 공지가 표시됩니다.",
     url: NOTICE_URL,
-    publishedAt: "오늘"
+    publishedAt: "지금"
   },
   {
-    source: "KLAS",
-    title: "로그인 의존도가 있는 공지 수집은 다음 단계에서 검토합니다.",
-    url: "https://klas.kw.ac.kr/",
-    publishedAt: "MVP 설계"
+    source: "광운대 공지",
+    category: "학사",
+    title: "옵션 페이지에서 필요한 카테고리만 선택할 수 있습니다.",
+    url: NOTICE_URL,
+    publishedAt: "MVP"
   },
   {
-    source: "학생 생활",
-    title: "학식과 전화번호부는 팝업에서 빠르게 접근할 수 있게 구성했습니다.",
-    url: "https://www.kw.ac.kr/ko/life/facility11.jsp",
-    publishedAt: "초기 버전"
+    source: "광운대 공지",
+    category: "학생",
+    title: "선택한 카테고리에 맞는 공지만 3건까지 노출합니다.",
+    url: NOTICE_URL,
+    publishedAt: "안내"
   }
 ];
 
@@ -43,6 +50,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   renderNotices([
     {
       source: "광운대 공지",
+      category: "전체",
       title: "공지사항을 불러오는 중입니다.",
       url: NOTICE_URL,
       publishedAt: ""
@@ -69,9 +77,7 @@ function renderQuickLinks() {
     anchor.href = link.url;
     anchor.target = "_blank";
     anchor.rel = "noreferrer";
-    anchor.innerHTML = `
-      <span class="link-title">${link.title}</span>
-    `;
+    anchor.innerHTML = `<span class="link-title">${link.title}</span>`;
     container.appendChild(anchor);
   });
 }
@@ -84,7 +90,7 @@ function renderNotices(notices) {
     const item = document.createElement("li");
     item.className = "notice-item";
     item.innerHTML = `
-      <span class="notice-source">${notice.source}</span>
+      <span class="notice-source">${notice.source} · ${notice.category}</span>
       <a class="notice-link" href="${notice.url}" target="_blank" rel="noreferrer">${notice.title}</a>
       <div class="notice-date">${notice.publishedAt}</div>
     `;
@@ -202,14 +208,26 @@ async function loadLatestNotices() {
     }
 
     const html = await response.text();
-    const notices = parseKwNotices(html);
+    const rawNotices = parseKwNotices(html);
+    const settings = await chrome.storage.sync.get(DEFAULT_NOTICE_SETTINGS);
+    const filteredNotices = filterNoticesByCategory(rawNotices, settings.selectedNoticeCategories);
 
-    if (!notices.length) {
-      throw new Error("No notices parsed");
+    if (!filteredNotices.length) {
+      renderNotices([
+        {
+          source: "광운대 공지",
+          category: "설정",
+          title: "선택한 카테고리에 해당하는 공지가 없습니다. 옵션에서 카테고리를 조정해보세요.",
+          url: NOTICE_URL,
+          publishedAt: "필터 결과"
+        }
+      ]);
+      return;
     }
 
-    renderNotices(notices.slice(0, 3));
-    await chrome.storage.local.set({ latestNotices: notices.slice(0, 3) });
+    const latest = filteredNotices.slice(0, 3);
+    renderNotices(latest);
+    await chrome.storage.local.set({ latestNotices: latest });
   } catch (error) {
     const { latestNotices } = await chrome.storage.local.get("latestNotices");
     renderNotices(latestNotices?.length ? latestNotices : SAMPLE_NOTICES);
@@ -225,40 +243,54 @@ function parseKwNotices(html) {
 
   for (const anchor of anchors) {
     const href = anchor.getAttribute("href");
-    const title = normalizeNoticeTitle(anchor.textContent || "");
+    const parsedTitle = parseCategoryAndTitle(anchor.textContent || "");
 
-    if (!href || !title || seen.has(href)) {
+    if (!href || !parsedTitle.title || seen.has(href)) {
       continue;
     }
 
-    const metaText = extractNearbyMeta(anchor);
-
     notices.push({
       source: "광운대 공지",
-      title,
+      category: parsedTitle.category,
+      title: parsedTitle.title,
       url: new URL(href, NOTICE_URL).toString(),
-      publishedAt: metaText || "작성일 정보 없음"
+      publishedAt: extractNearbyDate(anchor) || "작성일 정보 없음"
     });
 
     seen.add(href);
-
-    if (notices.length === 3) {
-      break;
-    }
   }
 
   return notices;
 }
 
-function normalizeNoticeTitle(value) {
-  return value
+function parseCategoryAndTitle(value) {
+  const normalized = value
     .replace(/\s+/g, " ")
     .replace(/신규게시글/g, "")
     .replace(/Attachment/g, "")
     .trim();
+
+  const match = normalized.match(/^\[([^\]]+)\]\s*(.+)$/);
+
+  if (!match) {
+    return { category: "일반", title: normalized };
+  }
+
+  return {
+    category: match[1].trim(),
+    title: match[2].trim()
+  };
 }
 
-function extractNearbyMeta(anchor) {
+function filterNoticesByCategory(notices, selectedCategories = ["전체"]) {
+  if (!selectedCategories.length || selectedCategories.includes("전체")) {
+    return notices;
+  }
+
+  return notices.filter((notice) => selectedCategories.includes(notice.category));
+}
+
+function extractNearbyDate(anchor) {
   const candidateTexts = [];
   let current = anchor.parentElement;
 
