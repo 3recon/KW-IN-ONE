@@ -11,24 +11,32 @@ const QUICK_LINKS = [
 const NOTICE_URL =
   "https://www.kw.ac.kr/ko/life/notice.jsp?srCategoryId=&mode=list&searchKey=1&searchVal=";
 
+const DEFAULT_SETTINGS = {
+  refreshMinutes: 30,
+  selectedNoticeCategories: ["전체"]
+};
+
 const SAMPLE_NOTICES = [
   {
-    source: "광운대 홈페이지",
-    title: "공지 수집 어댑터 연결 전까지는 예시 공지가 표시됩니다.",
+    source: "광운대 공지",
+    category: "일반",
+    title: "공지사항을 불러오지 못해 예시 공지가 표시됩니다.",
     url: NOTICE_URL,
-    publishedAt: "오늘"
+    publishedAt: "지금"
   },
   {
-    source: "KLAS",
-    title: "로그인 의존도가 있는 공지 수집은 다음 단계에서 검토합니다.",
-    url: "https://klas.kw.ac.kr/",
-    publishedAt: "MVP 설계"
+    source: "광운대 공지",
+    category: "학사",
+    title: "설정 화면에서 필요한 카테고리만 선택할 수 있습니다.",
+    url: NOTICE_URL,
+    publishedAt: "MVP"
   },
   {
-    source: "학생 생활",
-    title: "학식과 전화번호부는 팝업에서 빠르게 접근할 수 있게 구성했습니다.",
-    url: "https://www.kw.ac.kr/ko/life/facility11.jsp",
-    publishedAt: "초기 버전"
+    source: "광운대 공지",
+    category: "학생",
+    title: "선택한 카테고리에 맞는 공지만 3건까지 노출합니다.",
+    url: NOTICE_URL,
+    publishedAt: "안내"
   }
 ];
 
@@ -40,23 +48,12 @@ const SAMPLE_MEALS = {
 
 document.addEventListener("DOMContentLoaded", async () => {
   renderQuickLinks();
-  renderNotices([
-    {
-      source: "광운대 공지",
-      title: "공지사항을 불러오는 중입니다.",
-      url: NOTICE_URL,
-      publishedAt: ""
-    }
-  ]);
   renderMealSection();
   renderPhonebook(window.KW_PHONEBOOK || []);
+  renderCategoryOptions(window.KW_NOTICE_CATEGORIES || []);
   bindEvents();
+  await loadSettings();
   await loadLatestNotices();
-
-  const { lastRefreshAt } = await chrome.storage.local.get("lastRefreshAt");
-  if (lastRefreshAt) {
-    appendRefreshNotice(lastRefreshAt);
-  }
 });
 
 function renderQuickLinks() {
@@ -69,9 +66,7 @@ function renderQuickLinks() {
     anchor.href = link.url;
     anchor.target = "_blank";
     anchor.rel = "noreferrer";
-    anchor.innerHTML = `
-      <span class="link-title">${link.title}</span>
-    `;
+    anchor.innerHTML = `<span class="link-title">${link.title}</span>`;
     container.appendChild(anchor);
   });
 }
@@ -84,7 +79,7 @@ function renderNotices(notices) {
     const item = document.createElement("li");
     item.className = "notice-item";
     item.innerHTML = `
-      <span class="notice-source">${notice.source}</span>
+      <span class="notice-source">${notice.source} · ${notice.category}</span>
       <a class="notice-link" href="${notice.url}" target="_blank" rel="noreferrer">${notice.title}</a>
       <div class="notice-date">${notice.publishedAt}</div>
     `;
@@ -134,8 +129,7 @@ function renderPhonebook(entries) {
     .map((category) => `<option value="${category}">${category}</option>`)
     .join("");
 
-  const initialCategory = categories[0];
-  drawPhoneList(entries, initialCategory);
+  drawPhoneList(entries, categories[0]);
 
   select.addEventListener("change", (event) => {
     drawPhoneList(entries, event.target.value);
@@ -159,38 +153,113 @@ function drawPhoneList(entries, category) {
     });
 }
 
+function renderCategoryOptions(categories) {
+  const container = document.getElementById("categoryList");
+  container.innerHTML = "";
+
+  categories.forEach((category) => {
+    const label = document.createElement("label");
+    label.className = "category-item";
+    label.innerHTML = `
+      <input type="checkbox" name="noticeCategory" value="${category}">
+      <span>${category}</span>
+    `;
+    container.appendChild(label);
+  });
+}
+
 function bindEvents() {
+  document.getElementById("toggleSettings").addEventListener("click", () => {
+    document.getElementById("settingsPanel").classList.toggle("is-collapsed");
+  });
+
   document.getElementById("openDiningPage").addEventListener("click", () => {
     chrome.tabs.create({ url: "https://www.kw.ac.kr/ko/life/facility11.jsp" });
   });
 
-  document.getElementById("refreshNotices").addEventListener("click", async () => {
-    const refreshedAt = new Date().toLocaleString("ko-KR");
-    await chrome.storage.local.set({ lastRefreshAt: refreshedAt });
-    await loadLatestNotices();
-    appendRefreshNotice(refreshedAt);
+  document.getElementById("saveSettings").addEventListener("click", saveSettings);
+  bindCategorySelectionRules();
+}
+
+function bindCategorySelectionRules() {
+  const categoryCheckboxes = [...document.querySelectorAll('input[name="noticeCategory"]')];
+  const allCheckbox = categoryCheckboxes.find((checkbox) => checkbox.value === "전체");
+
+  if (!allCheckbox) {
+    return;
+  }
+
+  allCheckbox.addEventListener("change", () => {
+    if (!allCheckbox.checked) {
+      return;
+    }
+
+    categoryCheckboxes.forEach((checkbox) => {
+      checkbox.checked = checkbox.value === "전체";
+    });
+  });
+
+  categoryCheckboxes
+    .filter((checkbox) => checkbox.value !== "전체")
+    .forEach((checkbox) => {
+      checkbox.addEventListener("change", () => {
+        if (checkbox.checked) {
+          allCheckbox.checked = false;
+        }
+
+        const checkedSpecific = categoryCheckboxes.some(
+          (item) => item.value !== "전체" && item.checked
+        );
+
+        if (!checkedSpecific) {
+          allCheckbox.checked = true;
+        }
+      });
+    });
+}
+
+async function loadSettings() {
+  const settings = await chrome.storage.sync.get(DEFAULT_SETTINGS);
+  applySelectedCategories(settings.selectedNoticeCategories);
+}
+
+function applySelectedCategories(selectedCategories) {
+  const categoryCheckboxes = [...document.querySelectorAll('input[name="noticeCategory"]')];
+  const useAll = !selectedCategories.length || selectedCategories.includes("전체");
+
+  categoryCheckboxes.forEach((checkbox) => {
+    if (useAll) {
+      checkbox.checked = checkbox.value === "전체";
+      return;
+    }
+
+    checkbox.checked = selectedCategories.includes(checkbox.value);
   });
 }
 
-function appendRefreshNotice(refreshedAt) {
-  const list = document.getElementById("noticeList");
-  const first = list.querySelector(".notice-item");
+async function saveSettings() {
+  const selectedNoticeCategories = normalizeSelectedCategories(
+    [...document.querySelectorAll('input[name="noticeCategory"]:checked')].map(
+      (checkbox) => checkbox.value
+    )
+  );
 
-  if (!first) {
-    return;
+  await chrome.storage.sync.set({
+    refreshMinutes: DEFAULT_SETTINGS.refreshMinutes,
+    selectedNoticeCategories
+  });
+
+  document.getElementById("settingsStatus").textContent = "설정이 저장되었습니다.";
+  await loadLatestNotices();
+  document.getElementById("settingsPanel").classList.add("is-collapsed");
+}
+
+function normalizeSelectedCategories(categories) {
+  if (!categories.length || categories.includes("전체")) {
+    return ["전체"];
   }
 
-  const existing = document.getElementById("refreshStamp");
-  if (existing) {
-    existing.textContent = `마지막 새로고침: ${refreshedAt}`;
-    return;
-  }
-
-  const stamp = document.createElement("div");
-  stamp.id = "refreshStamp";
-  stamp.className = "notice-date";
-  stamp.textContent = `마지막 새로고침: ${refreshedAt}`;
-  first.appendChild(stamp);
+  return categories;
 }
 
 async function loadLatestNotices() {
@@ -202,14 +271,29 @@ async function loadLatestNotices() {
     }
 
     const html = await response.text();
-    const notices = parseKwNotices(html);
+    const rawNotices = parseKwNotices(html);
+    const settings = await chrome.storage.sync.get(DEFAULT_SETTINGS);
+    const filteredNotices = filterNoticesByCategory(
+      rawNotices,
+      settings.selectedNoticeCategories
+    );
 
-    if (!notices.length) {
-      throw new Error("No notices parsed");
+    if (!filteredNotices.length) {
+      renderNotices([
+        {
+          source: "광운대 공지",
+          category: "설정",
+          title: "선택한 카테고리에 해당하는 공지가 없습니다.",
+          url: NOTICE_URL,
+          publishedAt: "필터 결과"
+        }
+      ]);
+      return;
     }
 
-    renderNotices(notices.slice(0, 3));
-    await chrome.storage.local.set({ latestNotices: notices.slice(0, 3) });
+    const latest = filteredNotices.slice(0, 3);
+    renderNotices(latest);
+    await chrome.storage.local.set({ latestNotices: latest });
   } catch (error) {
     const { latestNotices } = await chrome.storage.local.get("latestNotices");
     renderNotices(latestNotices?.length ? latestNotices : SAMPLE_NOTICES);
@@ -225,40 +309,54 @@ function parseKwNotices(html) {
 
   for (const anchor of anchors) {
     const href = anchor.getAttribute("href");
-    const title = normalizeNoticeTitle(anchor.textContent || "");
+    const parsedTitle = parseCategoryAndTitle(anchor.textContent || "");
 
-    if (!href || !title || seen.has(href)) {
+    if (!href || !parsedTitle.title || seen.has(href)) {
       continue;
     }
 
-    const metaText = extractNearbyMeta(anchor);
-
     notices.push({
       source: "광운대 공지",
-      title,
+      category: parsedTitle.category,
+      title: parsedTitle.title,
       url: new URL(href, NOTICE_URL).toString(),
-      publishedAt: metaText || "작성일 정보 없음"
+      publishedAt: extractNearbyDate(anchor) || "작성일 정보 없음"
     });
 
     seen.add(href);
-
-    if (notices.length === 3) {
-      break;
-    }
   }
 
   return notices;
 }
 
-function normalizeNoticeTitle(value) {
-  return value
+function parseCategoryAndTitle(value) {
+  const normalized = value
     .replace(/\s+/g, " ")
     .replace(/신규게시글/g, "")
     .replace(/Attachment/g, "")
     .trim();
+
+  const match = normalized.match(/^\[([^\]]+)\]\s*(.+)$/);
+
+  if (!match) {
+    return { category: "일반", title: normalized };
+  }
+
+  return {
+    category: match[1].trim(),
+    title: match[2].trim()
+  };
 }
 
-function extractNearbyMeta(anchor) {
+function filterNoticesByCategory(notices, selectedCategories = ["전체"]) {
+  if (!selectedCategories.length || selectedCategories.includes("전체")) {
+    return notices;
+  }
+
+  return notices.filter((notice) => selectedCategories.includes(notice.category));
+}
+
+function extractNearbyDate(anchor) {
   const candidateTexts = [];
   let current = anchor.parentElement;
 
