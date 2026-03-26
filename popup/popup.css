@@ -36,13 +36,6 @@ body {
   box-shadow: var(--shadow);
 }
 
-.hero-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
-
 h1 {
   margin: 0;
   font-size: 28px;
@@ -74,6 +67,12 @@ h2 {
 .muted {
   color: var(--muted);
   font-size: 12px;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .link-grid {
@@ -239,7 +238,15 @@ h2 {
   font-size: 14px;
 }
 
-.settings-panel.is-collapsed {
+.inline-settings {
+  margin-bottom: 14px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: #fffaf2;
+}
+
+.inline-settings.is-collapsed {
   display: none;
 }
 
