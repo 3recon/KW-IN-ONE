@@ -197,6 +197,12 @@ h2 {
   line-height: 1.4;
 }
 
+.meal-time {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--muted);
+}
+
 .ghost-button,
 .select,
 .primary-button {
