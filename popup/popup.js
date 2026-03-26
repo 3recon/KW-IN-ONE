@@ -409,7 +409,7 @@ async function loadDiningMenus() {
     }
 
     const html = await response.text();
-    const parsedMeals = parseDiningMenus(html, new Date());
+    const parsedMeals = parseDiningMenus(html, getKoreaToday());
 
     if (!parsedMeals.entries.length) {
       throw new Error("No dining menu parsed");
@@ -557,13 +557,13 @@ function splitMenuGroups(sectionLines) {
 }
 
 function pickMealLabel(now) {
-  const hour = now.getHours();
+  const koreaHour = getKoreaHour(now);
 
-  if (hour < 10) {
+  if (koreaHour < 10) {
     return "오늘 아침";
   }
 
-  if (hour < 14) {
+  if (koreaHour < 14) {
     return "오늘 점심";
   }
 
@@ -571,8 +571,30 @@ function pickMealLabel(now) {
 }
 
 function formatDate(date) {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
+  const formatter = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Seoul",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit"
+  });
+  const parts = formatter.formatToParts(date);
+  const year = parts.find((part) => part.type === "year")?.value;
+  const month = parts.find((part) => part.type === "month")?.value;
+  const day = parts.find((part) => part.type === "day")?.value;
+
   return `${year}-${month}-${day}`;
+}
+
+function getKoreaToday() {
+  return new Date();
+}
+
+function getKoreaHour(date) {
+  const formatter = new Intl.DateTimeFormat("en-US", {
+    timeZone: "Asia/Seoul",
+    hour: "2-digit",
+    hour12: false
+  });
+
+  return Number(formatter.format(date));
 }
