@@ -36,9 +36,10 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
 
   chrome.notifications.create({
     type: "basic",
-    iconUrl: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9p4fNwAAAABJRU5ErkJggg==",
+    iconUrl:
+      "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9p4fNwAAAABJRU5ErkJggg==",
     title: "KW IN ONE",
-    message: "공지 새로고침이 실행되었습니다. 실제 공지 수집 로직은 다음 단계에서 연결됩니다."
+    message: "공지 새로고침이 실행되었습니다."
   });
 });
 

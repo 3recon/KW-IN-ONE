@@ -77,10 +77,11 @@ function applySelectedCategories(selectedCategories) {
 
 async function saveSettings() {
   const notificationsEnabled = document.getElementById("notificationsEnabled").checked;
-  const refreshMinutes = Number(document.getElementById("refreshMinutes").value) || defaults.refreshMinutes;
-  const checkedCategories = [...document.querySelectorAll('input[name="noticeCategory"]:checked')].map(
-    (checkbox) => checkbox.value
-  );
+  const refreshMinutes =
+    Number(document.getElementById("refreshMinutes").value) || defaults.refreshMinutes;
+  const checkedCategories = [
+    ...document.querySelectorAll('input[name="noticeCategory"]:checked')
+  ].map((checkbox) => checkbox.value);
   const selectedNoticeCategories = normalizeSelectedCategories(checkedCategories);
 
   await chrome.storage.sync.set({

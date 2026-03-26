@@ -140,8 +140,7 @@ function renderPhonebook(entries) {
     .map((category) => `<option value="${category}">${category}</option>`)
     .join("");
 
-  const initialCategory = categories[0];
-  drawPhoneList(entries, initialCategory);
+  drawPhoneList(entries, categories[0]);
 
   select.addEventListener("change", (event) => {
     drawPhoneList(entries, event.target.value);
@@ -210,14 +209,17 @@ async function loadLatestNotices() {
     const html = await response.text();
     const rawNotices = parseKwNotices(html);
     const settings = await chrome.storage.sync.get(DEFAULT_NOTICE_SETTINGS);
-    const filteredNotices = filterNoticesByCategory(rawNotices, settings.selectedNoticeCategories);
+    const filteredNotices = filterNoticesByCategory(
+      rawNotices,
+      settings.selectedNoticeCategories
+    );
 
     if (!filteredNotices.length) {
       renderNotices([
         {
           source: "광운대 공지",
           category: "설정",
-          title: "선택한 카테고리에 해당하는 공지가 없습니다. 옵션에서 카테고리를 조정해보세요.",
+          title: "선택한 카테고리에 해당하는 공지가 없습니다.",
           url: NOTICE_URL,
           publishedAt: "필터 결과"
         }
