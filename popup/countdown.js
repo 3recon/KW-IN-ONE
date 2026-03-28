@@ -178,10 +178,9 @@ function renderCountdownList(countdowns, now = new Date()) {
       (countdown) => `
         <div class="countdown-item">
           <div class="countdown-item-main">
-            <span class="countdown-item-title">${countdown.label}</span>
+            <span class="countdown-item-remaining">${formatRemainingText(countdown, now)}</span>
             <span class="countdown-item-date">${formatDateTime(countdown.targetDateTime)}</span>
           </div>
-          <div class="countdown-item-remaining">${formatRemainingText(countdown, now)}</div>
           <div class="countdown-item-actions">
             <button class="ghost-button" type="button" data-action="edit" data-id="${countdown.id}">수정</button>
             <button class="ghost-button" type="button" data-action="delete" data-id="${countdown.id}">삭제</button>
