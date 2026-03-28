@@ -1,14 +1,14 @@
 :root {
   color-scheme: light;
-  --bg: #f7f1ef;
-  --panel: #fffdfb;
-  --panel-strong: #f5ebe8;
+  --bg: #f1eeea;
+  --panel: #fcfbf8;
+  --panel-strong: #eee7e1;
   --text: #241816;
-  --muted: #7d6762;
-  --line: #e4d0cb;
+  --muted: #746762;
+  --line: #d8cfc8;
   --accent: #8a1601;
   --accent-strong: #5b0d12;
-  --accent-soft: #f2d9d3;
+  --accent-soft: #e7ddd8;
   --shadow: 0 16px 36px rgba(91, 13, 18, 0.12);
 }
 
@@ -22,8 +22,8 @@ body {
   min-height: 760px;
   font-family: "Segoe UI", "Apple SD Gothic Neo", sans-serif;
   background:
-    radial-gradient(circle at top right, rgba(138, 22, 1, 0.16), transparent 30%),
-    linear-gradient(180deg, #fbf5f3 0%, var(--bg) 100%);
+    radial-gradient(circle at top right, rgba(138, 22, 1, 0.1), transparent 28%),
+    linear-gradient(180deg, #f6f3ef 0%, var(--bg) 100%);
   color: var(--text);
 }
 
@@ -68,7 +68,7 @@ h1 {
 }
 
 .countdown-panel {
-  background: linear-gradient(180deg, #fff7f5 0%, #f7ece9 100%);
+  background: linear-gradient(180deg, #fbf8f5 0%, #f1ebe5 100%);
 }
 
 .section-header {
@@ -110,7 +110,7 @@ h2 {
   padding: 12px;
   border: 1px solid var(--line);
   border-radius: 14px;
-  background: linear-gradient(180deg, #fffefd 0%, #f8ece8 100%);
+  background: linear-gradient(180deg, #fefdfb 0%, #f3ece6 100%);
   text-decoration: none;
   color: inherit;
   transition: transform 120ms ease, border-color 120ms ease, box-shadow 120ms ease;
@@ -195,7 +195,7 @@ h2 {
   padding: 12px;
   border-radius: 14px;
   border: 1px solid var(--line);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.92) 0%, rgba(248, 236, 232, 0.84) 100%);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.94) 0%, rgba(241, 235, 229, 0.9) 100%);
 }
 
 .countdown-item-main {
@@ -233,7 +233,7 @@ h2 {
 }
 
 .meal-panel {
-  background: linear-gradient(180deg, #fff8f6 0%, #f6ece8 100%);
+  background: linear-gradient(180deg, #fcf9f6 0%, #f1ebe5 100%);
 }
 
 .pill {
@@ -312,7 +312,7 @@ h2 {
 }
 
 .ghost-button {
-  background: #fffaf8;
+  background: #fdfbf8;
 }
 
 .ghost-button:hover {
@@ -344,7 +344,7 @@ h2 {
   padding: 14px;
   border: 1px solid var(--line);
   border-radius: 16px;
-  background: #fff8f6;
+  background: #fbf8f4;
 }
 
 .inline-settings.is-collapsed {
@@ -375,7 +375,7 @@ h2 {
   padding: 10px 12px;
   border: 1px solid var(--line);
   border-radius: 12px;
-  background: #fff8f6;
+  background: #faf7f3;
   font-size: 13px;
 }
 
@@ -399,7 +399,7 @@ h2 {
   padding: 16px;
   border: 1px solid var(--line);
   border-radius: 20px;
-  background: #fffdf8;
+  background: #fcfbf8;
   box-shadow: var(--shadow);
   transform: translate(-50%, -50%);
   overflow: auto;
@@ -419,7 +419,7 @@ h2 {
   padding: 12px 14px;
   border: 1px solid var(--line);
   border-radius: 14px;
-  background: linear-gradient(180deg, #fffefd 0%, #f8ece8 100%);
+  background: linear-gradient(180deg, #fefdfb 0%, #f3ece6 100%);
   color: inherit;
   text-decoration: none;
   font-size: 14px;
@@ -456,7 +456,7 @@ h2 {
   padding: 16px;
   border: 1px solid var(--line);
   border-radius: 20px;
-  background: #fffdf8;
+  background: #fcfbf8;
   box-shadow: var(--shadow);
   transform: translate(-50%, -50%);
 }
