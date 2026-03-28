@@ -7,7 +7,35 @@ export const QUICK_LINKS = [
   { id: "everytime", title: "에브리타임", url: "https://kw.everytime.kr/" },
   { id: "dining", title: "학식", url: "https://www.kw.ac.kr/ko/life/facility11.jsp" },
   { id: "campus-phone", title: "교내전화번호", url: "https://www.kw.ac.kr/ko/tour/phone.jsp" },
-  { id: "library", title: "중앙도서관", url: "https://kupis.kw.ac.kr/" }
+  { id: "departments", title: "단과대 바로가기", action: "open-departments" }
+];
+
+export const DEPARTMENT_LINKS = [
+  { id: "ei", title: "전자정보공과대학", url: "https://ei.kw.ac.kr/" },
+  { id: "ai", title: "인공지능융합대학", url: "https://aicon.kw.ac.kr/main/main.php" },
+  {
+    id: "engineering",
+    title: "공과대학",
+    url: "https://www.kw.ac.kr/ko/univ/college_view.jsp?hpage=college_003"
+  },
+  {
+    id: "science",
+    title: "자연과학대학",
+    url: "https://www.kw.ac.kr/ko/univ/college_view.jsp?hpage=college_004"
+  },
+  { id: "humanities", title: "인문사회과학대", url: "https://chss.kw.ac.kr/" },
+  {
+    id: "law",
+    title: "정책법학대학",
+    url: "https://www.kw.ac.kr/ko/univ/college_view.jsp?hpage=college_006"
+  },
+  { id: "business", title: "경영대학", url: "https://biz.kw.ac.kr/" },
+  {
+    id: "chambit",
+    title: "참빛인재대학",
+    url: "https://www.kw.ac.kr/ko/univ/college_view.jsp?hpage=college_010"
+  },
+  { id: "ingenium", title: "인제니움대학", url: "https://ingenium.kw.ac.kr/" }
 ];
 
 export const NOTICE_URL =

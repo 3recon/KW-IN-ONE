@@ -1,6 +1,6 @@
 import { SAMPLE_MEALS } from "./constants.js";
 import { initializeCountdown } from "./countdown.js";
-import { renderQuickLinks } from "./links.js";
+import { bindDepartmentModal, renderDepartmentLinks, renderQuickLinks } from "./links.js";
 import { bindDiningOpen, loadDiningMenus, renderMealSection } from "./dining.js";
 import {
   bindCategorySelectionRules,
@@ -12,6 +12,7 @@ import { loadLatestNotices } from "./notices.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
   renderQuickLinks();
+  renderDepartmentLinks();
   renderCategoryOptions(window.KW_NOTICE_CATEGORIES || []);
   renderMealSection(SAMPLE_MEALS);
   bindEvents();
@@ -21,6 +22,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 function bindEvents() {
+  bindDepartmentModal();
+
   document.getElementById("toggleSettings").addEventListener("click", () => {
     document.getElementById("settingsPanel").classList.toggle("is-collapsed");
   });
