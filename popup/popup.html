@@ -19,6 +19,26 @@
         <div class="link-grid" id="quickLinks"></div>
       </section>
 
+      <section class="panel countdown-panel">
+        <div class="section-header">
+          <h2>시험 디데이</h2>
+          <button id="toggleCountdownSettings" class="ghost-button" type="button">일정 설정</button>
+        </div>
+        <div id="countdownDisplay" class="countdown-display"></div>
+        <section class="inline-settings is-collapsed" id="countdownSettings">
+          <div class="settings-group">
+            <label class="select-label" for="countdownLabelInput">일정명</label>
+            <input id="countdownLabelInput" class="number-input" type="text" placeholder="예: 자료구조 중간고사">
+          </div>
+          <div class="settings-group">
+            <label class="select-label" for="countdownDateTimeInput">날짜와 시간</label>
+            <input id="countdownDateTimeInput" class="number-input" type="datetime-local">
+          </div>
+          <button id="saveCountdown" class="primary-button full-width" type="button">일정 저장</button>
+          <div id="countdownStatus" class="settings-status"></div>
+        </section>
+      </section>
+
       <section class="panel">
         <div class="section-header">
           <h2>통합 공지</h2>

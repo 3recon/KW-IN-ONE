@@ -1,4 +1,5 @@
 import { SAMPLE_MEALS } from "./constants.js";
+import { initializeCountdown } from "./countdown.js";
 import { renderQuickLinks } from "./links.js";
 import { bindDiningOpen, loadDiningMenus, renderMealSection } from "./dining.js";
 import {
@@ -14,6 +15,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   renderCategoryOptions(window.KW_NOTICE_CATEGORIES || []);
   renderMealSection(SAMPLE_MEALS);
   bindEvents();
+  await initializeCountdown();
   await loadSettings();
   await Promise.all([loadLatestNotices(), loadDiningMenus()]);
 });
