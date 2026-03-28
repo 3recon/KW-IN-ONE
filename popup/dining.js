@@ -44,7 +44,8 @@ export function renderMealSection(mealState) {
   const labelNode = document.getElementById("mealLabel");
   const summaryNode = document.getElementById("mealSummary");
 
-  labelNode.textContent = mealState.focusLabel;
+  labelNode.textContent = mealState.focusLabel || "";
+  labelNode.hidden = !mealState.focusLabel;
   summaryNode.innerHTML = mealState.entries
     .map(
       (entry) => `
@@ -70,7 +71,7 @@ export function bindDiningOpen() {
 
 function renderMealLines(items) {
   if (!items.length) {
-    return "<span>운영 정보 없음</span>";
+    return "";
   }
 
   const lines = [];
@@ -91,7 +92,7 @@ function parseDiningMenus(html, now) {
   if (!table || targetColumnIndex === -1) {
     return {
       date: formatDate(now),
-      focusLabel: "운영 정보 없음",
+      focusLabel: "",
       entries: [
         {
           name: "오늘 식단",
