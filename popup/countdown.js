@@ -47,11 +47,9 @@ async function loadCountdowns() {
   const stored = await chrome.storage.sync.get(COUNTDOWN_STORAGE_KEY);
   const countdowns = stored[COUNTDOWN_STORAGE_KEY] || [];
 
-  renderCountdownList(countdowns);
-
   if (!countdowns.length) {
     stopCountdownTimer();
-    renderCountdownMessage("시험 일정을 등록하면 남은 시간을 표시합니다.");
+    renderCountdownList([]);
     return;
   }
 
@@ -137,7 +135,7 @@ async function handleCountdownListClick(event) {
 
     if (!nextCountdowns.length) {
       stopCountdownTimer();
-      renderCountdownMessage("시험 일정을 등록하면 남은 시간을 표시합니다.");
+      renderCountdownList([]);
       return;
     }
 
@@ -160,37 +158,14 @@ function stopCountdownTimer() {
 
 function updateCountdown(countdowns) {
   const now = new Date();
-  const nearest = findNearestUpcomingCountdown(countdowns, now);
-
-  if (!nearest) {
-    renderCountdownMessage("등록된 시험 일정이 모두 시작되었습니다.");
-    return;
-  }
-
-  const target = new Date(nearest.targetDateTime);
-  const diff = target.getTime() - now.getTime();
-
-  if (Number.isNaN(target.getTime())) {
-    renderCountdownMessage("잘못된 날짜 형식입니다.");
-    return;
-  }
-
-  const totalSeconds = Math.floor(diff / 1000);
-  const days = Math.floor(totalSeconds / 86400);
-  const hours = Math.floor((totalSeconds % 86400) / 3600);
-  const minutes = Math.floor((totalSeconds % 3600) / 60);
-  const seconds = totalSeconds % 60;
-
-  renderCountdownMessage(
-    `${nearest.label}까지 ${days}일 ${hours}시간 ${minutes}분 ${seconds}초`
-  );
+  renderCountdownList(countdowns, now);
 }
 
-function renderCountdownList(countdowns) {
+function renderCountdownList(countdowns, now = new Date()) {
   const container = document.getElementById("countdownList");
 
   if (!countdowns.length) {
-    container.innerHTML = "";
+    container.innerHTML = '<div class="countdown-item-remaining">시험 일정을 등록하면 남은 시간을 표시합니다.</div>';
     return;
   }
 
@@ -203,9 +178,10 @@ function renderCountdownList(countdowns) {
       (countdown) => `
         <div class="countdown-item">
           <div class="countdown-item-main">
-            <strong>${countdown.label}</strong>
+            <span class="countdown-item-title">${countdown.label}</span>
             <span class="countdown-item-date">${formatDateTime(countdown.targetDateTime)}</span>
           </div>
+          <div class="countdown-item-remaining">${formatRemainingText(countdown, now)}</div>
           <div class="countdown-item-actions">
             <button class="ghost-button" type="button" data-action="edit" data-id="${countdown.id}">수정</button>
             <button class="ghost-button" type="button" data-action="delete" data-id="${countdown.id}">삭제</button>
@@ -216,23 +192,10 @@ function renderCountdownList(countdowns) {
     .join("");
 }
 
-function renderCountdownMessage(message) {
-  document.getElementById("countdownDisplay").textContent = message;
-}
-
 function resetCountdownForm() {
   editingCountdownId = null;
   document.getElementById("countdownLabelInput").value = "";
   document.getElementById("countdownDateTimeInput").value = "";
-}
-
-function findNearestUpcomingCountdown(countdowns, now) {
-  return countdowns
-    .filter((countdown) => new Date(countdown.targetDateTime).getTime() > now.getTime())
-    .sort(
-      (left, right) =>
-        new Date(left.targetDateTime).getTime() - new Date(right.targetDateTime).getTime()
-    )[0];
 }
 
 async function getStoredCountdowns() {
@@ -260,4 +223,25 @@ function formatDateTime(value) {
     minute: "2-digit",
     hour12: false
   }).format(date);
+}
+
+function formatRemainingText(countdown, now) {
+  const target = new Date(countdown.targetDateTime);
+  const diff = target.getTime() - now.getTime();
+
+  if (Number.isNaN(target.getTime())) {
+    return "잘못된 날짜 형식입니다.";
+  }
+
+  if (diff <= 0) {
+    return `${countdown.label} 일정이 시작되었습니다.`;
+  }
+
+  const totalSeconds = Math.floor(diff / 1000);
+  const days = Math.floor(totalSeconds / 86400);
+  const hours = Math.floor((totalSeconds % 86400) / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+
+  return `${countdown.label}까지 ${days}일 ${hours}시간 ${minutes}분 ${seconds}초`;
 }
