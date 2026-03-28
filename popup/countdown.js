@@ -80,7 +80,7 @@ function updateCountdown(countdown) {
   const seconds = totalSeconds % 60;
 
   renderCountdownMessage(
-    `[${countdown.label}] 시작까지 ${days}일 ${hours}시간 ${minutes}분 ${seconds}초`
+    `${countdown.label}까지 ${days}일 ${hours}시간 ${minutes}분 ${seconds}초`
   );
 }
 
