@@ -315,10 +315,10 @@ function renderCountdownList(countdowns, now = new Date()) {
         <div class="countdown-item">
           <div class="countdown-item-main">
             <div class="countdown-item-top">
-              <span class="countdown-item-remaining">${formatRemainingText(countdown, now)}</span>
+              <span class="countdown-item-remaining">${formatRemainingMarkup(countdown, now)}</span>
               <div class="countdown-item-actions">
-                <button class="ghost-button" type="button" data-action="edit" data-id="${countdown.id}">수정</button>
-                <button class="ghost-button" type="button" data-action="delete" data-id="${countdown.id}">삭제</button>
+                <button class="ghost-button countdown-action-button" type="button" data-action="edit" data-id="${countdown.id}">수정</button>
+                <button class="ghost-button countdown-action-button" type="button" data-action="delete" data-id="${countdown.id}">삭제</button>
               </div>
             </div>
             <span class="countdown-item-date">${formatDateTime(countdown.targetDateTime)}</span>
@@ -370,7 +370,7 @@ function formatDateTime(value) {
   }).format(date);
 }
 
-function formatRemainingText(countdown, now) {
+function formatRemainingMarkup(countdown, now) {
   const target = new Date(countdown.targetDateTime);
   const diff = target.getTime() - now.getTime();
 
@@ -379,7 +379,7 @@ function formatRemainingText(countdown, now) {
   }
 
   if (diff <= 0) {
-    return `${countdown.label} 일정이 시작되었습니다.`;
+    return `<span class="countdown-item-label">${countdown.label}</span><span class="countdown-item-subline"><span class="countdown-item-time">시작되었습니다.</span></span>`;
   }
 
   const totalSeconds = Math.floor(diff / 1000);
@@ -388,7 +388,7 @@ function formatRemainingText(countdown, now) {
   const minutes = Math.floor((totalSeconds % 3600) / 60);
   const seconds = totalSeconds % 60;
 
-  return `${countdown.label}까지 ${days}일 ${hours}시간 ${minutes}분 ${seconds}초`;
+  return `<span class="countdown-item-label">${countdown.label}</span><span class="countdown-item-subline"><span class="countdown-item-time">${days}일 ${hours}시간 ${minutes}분 ${seconds}초</span></span>`;
 }
 
 function formatDateTimeLocalValue(date) {

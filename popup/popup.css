@@ -205,7 +205,7 @@ h2 {
 
 .countdown-item-top {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
 }
@@ -219,11 +219,33 @@ h2 {
   font-size: 15px;
   line-height: 1.5;
   font-weight: 700;
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.countdown-item-label,
+.countdown-item-subline {
+  display: block;
+}
+
+.countdown-item-time {
+  font-weight: 400;
+  color: var(--accent);
 }
 
 .countdown-item-actions {
   display: flex;
+  flex-shrink: 0;
   gap: 8px;
+}
+
+.countdown-action-button {
+  padding: 6px 10px;
+  border-radius: 10px;
+  font-size: 11px;
+  line-height: 1.2;
 }
 
 .countdown-form-actions {
