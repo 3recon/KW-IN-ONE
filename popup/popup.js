@@ -1,6 +1,5 @@
 import { SAMPLE_MEALS } from "./constants.js";
 import { renderQuickLinks } from "./links.js";
-import { renderPhonebook } from "./phonebook.js";
 import { bindDiningOpen, loadDiningMenus, renderMealSection } from "./dining.js";
 import {
   bindCategorySelectionRules,
@@ -13,7 +12,6 @@ import { loadLatestNotices } from "./notices.js";
 document.addEventListener("DOMContentLoaded", async () => {
   renderQuickLinks();
   renderCategoryOptions(window.KW_NOTICE_CATEGORIES || []);
-  renderPhonebook(window.KW_PHONEBOOK || []);
   renderMealSection(SAMPLE_MEALS);
   bindEvents();
   await loadSettings();

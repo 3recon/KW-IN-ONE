@@ -5,7 +5,9 @@ export const QUICK_LINKS = [
   { id: "k-mooc", title: "K-MOOC", url: "https://www.kmooc.kr/" },
   { id: "webmail", title: "웹메일", url: "https://wmail.kw.ac.kr/" },
   { id: "everytime", title: "에브리타임", url: "https://kw.everytime.kr/" },
-  { id: "dining", title: "학식", url: "https://www.kw.ac.kr/ko/life/facility11.jsp" }
+  { id: "dining", title: "학식", url: "https://www.kw.ac.kr/ko/life/facility11.jsp" },
+  { id: "campus-phone", title: "교내전화번호", url: "https://www.kw.ac.kr/ko/tour/phone.jsp" },
+  { id: "library", title: "중앙도서관", url: "https://kupis.kw.ac.kr/" }
 ];
 
 export const NOTICE_URL =
