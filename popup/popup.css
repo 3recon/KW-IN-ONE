@@ -181,7 +181,7 @@ h2 {
 
 .countdown-item-top {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
 }
@@ -197,7 +197,8 @@ h2 {
   font-weight: 700;
   flex: 1;
   min-width: 0;
-  word-break: keep-all;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .countdown-item-actions {
