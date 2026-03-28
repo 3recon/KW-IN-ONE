@@ -31,6 +31,21 @@ body {
   padding: 18px;
 }
 
+.app-footer {
+  margin-top: 16px;
+  text-align: center;
+}
+
+.app-footer-link {
+  color: rgba(36, 24, 22, 0.46);
+  font-size: 11px;
+  text-decoration: none;
+}
+
+.app-footer-link:hover {
+  color: rgba(138, 22, 1, 0.72);
+}
+
 .hero {
   padding: 18px;
   border-radius: 20px;
