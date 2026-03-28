@@ -379,7 +379,7 @@ function formatRemainingMarkup(countdown, now) {
   }
 
   if (diff <= 0) {
-    return `${countdown.label} 일정이<br>시작되었습니다.`;
+    return `<span class="countdown-item-label">${countdown.label}</span><span class="countdown-item-subline">일정이 시작되었습니다.</span>`;
   }
 
   const totalSeconds = Math.floor(diff / 1000);
@@ -388,7 +388,7 @@ function formatRemainingMarkup(countdown, now) {
   const minutes = Math.floor((totalSeconds % 3600) / 60);
   const seconds = totalSeconds % 60;
 
-  return `${countdown.label} 일정까지<br>${days}일 ${hours}시간 ${minutes}분 ${seconds}초`;
+  return `<span class="countdown-item-label">${countdown.label}</span><span class="countdown-item-subline">까지 ${days}일 ${hours}시간 ${minutes}분 ${seconds}초</span>`;
 }
 
 function formatDateTimeLocalValue(date) {

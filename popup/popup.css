@@ -201,6 +201,11 @@ h2 {
   word-break: break-word;
 }
 
+.countdown-item-label,
+.countdown-item-subline {
+  display: block;
+}
+
 .countdown-item-actions {
   display: flex;
   flex-shrink: 0;
