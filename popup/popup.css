@@ -249,6 +249,18 @@ h2 {
   line-height: 1.2;
 }
 
+.countdown-delete-button {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.countdown-delete-button:hover {
+  background: var(--accent-strong);
+  border-color: var(--accent-strong);
+  color: #fff;
+}
+
 .countdown-form-actions {
   display: flex;
   gap: 10px;
