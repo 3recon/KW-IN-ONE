@@ -3,9 +3,12 @@ const LEGACY_COUNTDOWN_STORAGE_KEY = "examCountdown";
 
 let countdownTimerId = null;
 let editingCountdownId = null;
+let calendarCursorDate = new Date();
+let calendarSelectedDate = new Date();
 
 export async function initializeCountdown() {
   bindCountdownEvents();
+  initializeCalendarControls();
   await migrateLegacyCountdown();
   await loadCountdowns();
 }
@@ -17,6 +20,28 @@ function bindCountdownEvents() {
 
   document.getElementById("saveCountdown").addEventListener("click", saveCountdown);
   document.getElementById("countdownList").addEventListener("click", handleCountdownListClick);
+  document.getElementById("openCalendarModal").addEventListener("click", openCalendarModal);
+  document.getElementById("calendarBackdrop").addEventListener("click", closeCalendarModal);
+  document.getElementById("prevMonth").addEventListener("click", () => moveCalendarMonth(-1));
+  document.getElementById("nextMonth").addEventListener("click", () => moveCalendarMonth(1));
+  document.getElementById("confirmCalendar").addEventListener("click", confirmCalendarSelection);
+}
+
+function initializeCalendarControls() {
+  const hourSelect = document.getElementById("calendarHour");
+  const minuteSelect = document.getElementById("calendarMinute");
+
+  hourSelect.innerHTML = Array.from({ length: 24 }, (_, hour) => {
+    const value = String(hour).padStart(2, "0");
+    return `<option value="${value}">${value}</option>`;
+  }).join("");
+
+  minuteSelect.innerHTML = Array.from({ length: 60 }, (_, minute) => {
+    const value = String(minute).padStart(2, "0");
+    return `<option value="${value}">${value}</option>`;
+  }).join("");
+
+  syncCalendarInputs(new Date());
 }
 
 async function migrateLegacyCountdown() {
@@ -116,6 +141,10 @@ async function handleCountdownListClick(event) {
     editingCountdownId = selected.id;
     document.getElementById("countdownLabelInput").value = selected.label;
     document.getElementById("countdownDateTimeInput").value = selected.targetDateTime;
+    document.getElementById("openCalendarModal").textContent = formatCalendarButtonText(
+      selected.targetDateTime
+    );
+    syncCalendarInputs(new Date(selected.targetDateTime));
     document.getElementById("countdownStatus").textContent = "수정할 시험 일정을 편집 중입니다.";
     document.getElementById("countdownSettings").classList.remove("is-collapsed");
     return;
@@ -143,6 +172,110 @@ async function handleCountdownListClick(event) {
   }
 }
 
+function openCalendarModal() {
+  const currentValue = document.getElementById("countdownDateTimeInput").value;
+  const baseDate = currentValue ? new Date(currentValue) : new Date();
+  syncCalendarInputs(baseDate);
+  document.getElementById("calendarModal").classList.remove("is-collapsed");
+}
+
+function closeCalendarModal() {
+  document.getElementById("calendarModal").classList.add("is-collapsed");
+}
+
+function moveCalendarMonth(offset) {
+  calendarCursorDate = new Date(
+    calendarCursorDate.getFullYear(),
+    calendarCursorDate.getMonth() + offset,
+    1
+  );
+  renderCalendar();
+}
+
+function confirmCalendarSelection() {
+  const hour = document.getElementById("calendarHour").value;
+  const minute = document.getElementById("calendarMinute").value;
+  const selected = new Date(
+    calendarSelectedDate.getFullYear(),
+    calendarSelectedDate.getMonth(),
+    calendarSelectedDate.getDate(),
+    Number(hour),
+    Number(minute)
+  );
+  const isoValue = formatDateTimeLocalValue(selected);
+
+  document.getElementById("countdownDateTimeInput").value = isoValue;
+  document.getElementById("openCalendarModal").textContent = formatCalendarButtonText(isoValue);
+  closeCalendarModal();
+}
+
+function syncCalendarInputs(date) {
+  calendarSelectedDate = new Date(date);
+  calendarCursorDate = new Date(date.getFullYear(), date.getMonth(), 1);
+  document.getElementById("calendarHour").value = String(date.getHours()).padStart(2, "0");
+  document.getElementById("calendarMinute").value = String(date.getMinutes()).padStart(2, "0");
+  renderCalendar();
+}
+
+function renderCalendar() {
+  const year = calendarCursorDate.getFullYear();
+  const month = calendarCursorDate.getMonth();
+  const firstDay = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const prevMonthDays = new Date(year, month, 0).getDate();
+  const title = `${year}.${String(month + 1).padStart(2, "0")}`;
+
+  document.getElementById("calendarTitle").textContent = title;
+
+  const cells = [];
+
+  for (let index = firstDay - 1; index >= 0; index -= 1) {
+    cells.push(createDayButton(prevMonthDays - index, true, year, month - 1));
+  }
+
+  for (let day = 1; day <= daysInMonth; day += 1) {
+    cells.push(createDayButton(day, false, year, month));
+  }
+
+  while (cells.length % 7 !== 0) {
+    const day = cells.length - (firstDay + daysInMonth) + 1;
+    cells.push(createDayButton(day, true, year, month + 1));
+  }
+
+  document.getElementById("calendarGrid").innerHTML = cells.join("");
+  document.querySelectorAll(".calendar-day").forEach((button) => {
+    button.addEventListener("click", () => {
+      calendarSelectedDate = new Date(
+        Number(button.dataset.year),
+        Number(button.dataset.month),
+        Number(button.dataset.day)
+      );
+      calendarCursorDate = new Date(calendarSelectedDate.getFullYear(), calendarSelectedDate.getMonth(), 1);
+      renderCalendar();
+    });
+  });
+}
+
+function createDayButton(day, isMuted, year, month) {
+  const normalizedDate = new Date(year, month, day);
+  const isSelected =
+    normalizedDate.getFullYear() === calendarSelectedDate.getFullYear() &&
+    normalizedDate.getMonth() === calendarSelectedDate.getMonth() &&
+    normalizedDate.getDate() === calendarSelectedDate.getDate();
+
+  return `
+    <button
+      class="calendar-day${isMuted ? " is-muted" : ""}${isSelected ? " is-selected" : ""}"
+      type="button"
+      data-year="${normalizedDate.getFullYear()}"
+      data-month="${normalizedDate.getMonth()}"
+      data-day="${normalizedDate.getDate()}"
+    >
+      ${normalizedDate.getDate()}
+    </button>
+  `;
+}
+
 function startCountdown(countdowns) {
   stopCountdownTimer();
   updateCountdown(countdowns);
@@ -165,7 +298,8 @@ function renderCountdownList(countdowns, now = new Date()) {
   const container = document.getElementById("countdownList");
 
   if (!countdowns.length) {
-    container.innerHTML = '<div class="countdown-item-remaining">시험 일정을 등록하면 남은 시간을 표시합니다.</div>';
+    container.innerHTML =
+      '<div class="countdown-item-remaining">시험 일정을 등록하면 남은 시간을 표시합니다.</div>';
     return;
   }
 
@@ -197,6 +331,9 @@ function resetCountdownForm() {
   editingCountdownId = null;
   document.getElementById("countdownLabelInput").value = "";
   document.getElementById("countdownDateTimeInput").value = "";
+  document.getElementById("openCalendarModal").textContent = "날짜와 시간을 선택하세요";
+  document.getElementById("countdownStatus").textContent = "";
+  syncCalendarInputs(new Date());
 }
 
 async function getStoredCountdowns() {
@@ -245,4 +382,17 @@ function formatRemainingText(countdown, now) {
   const seconds = totalSeconds % 60;
 
   return `${countdown.label}까지 ${days}일 ${hours}시간 ${minutes}분 ${seconds}초`;
+}
+
+function formatDateTimeLocalValue(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  const hour = String(date.getHours()).padStart(2, "0");
+  const minute = String(date.getMinutes()).padStart(2, "0");
+  return `${year}-${month}-${day}T${hour}:${minute}`;
+}
+
+function formatCalendarButtonText(value) {
+  return formatDateTime(value);
 }

@@ -31,8 +31,9 @@
             <input id="countdownLabelInput" class="number-input" type="text" placeholder="예: 자료구조 중간고사">
           </div>
           <div class="settings-group">
-            <label class="select-label" for="countdownDateTimeInput">날짜와 시간</label>
-            <input id="countdownDateTimeInput" class="number-input" type="datetime-local">
+            <label class="select-label" for="openCalendarModal">날짜와 시간</label>
+            <input id="countdownDateTimeInput" type="hidden">
+            <button id="openCalendarModal" class="ghost-button full-width" type="button">날짜와 시간을 선택하세요</button>
           </div>
           <button id="saveCountdown" class="primary-button full-width" type="button">일정 저장</button>
           <div id="countdownStatus" class="settings-status"></div>
@@ -66,6 +67,36 @@
         </div>
         <div id="mealSummary" class="meal-summary"></div>
         <button id="openDiningPage" class="ghost-button full-width" type="button">학식 페이지 열기</button>
+      </section>
+
+      <section class="calendar-modal is-collapsed" id="calendarModal">
+        <div class="calendar-backdrop" id="calendarBackdrop"></div>
+        <div class="calendar-dialog">
+          <div class="calendar-header">
+            <button id="prevMonth" class="ghost-button" type="button">이전</button>
+            <div id="calendarTitle" class="calendar-title"></div>
+            <button id="nextMonth" class="ghost-button" type="button">다음</button>
+          </div>
+          <div class="calendar-weekdays">
+            <span>일</span>
+            <span>월</span>
+            <span>화</span>
+            <span>수</span>
+            <span>목</span>
+            <span>금</span>
+            <span>토</span>
+          </div>
+          <div id="calendarGrid" class="calendar-grid"></div>
+          <div class="calendar-time-row">
+            <label class="select-label" for="calendarHour">시간</label>
+            <div class="calendar-time-selects">
+              <select id="calendarHour" class="select"></select>
+              <span>:</span>
+              <select id="calendarMinute" class="select"></select>
+            </div>
+          </div>
+          <button id="confirmCalendar" class="primary-button full-width" type="button">확인</button>
+        </div>
       </section>
     </main>
 
