@@ -23,6 +23,7 @@ function bindCountdownEvents() {
   document.getElementById("countdownList").addEventListener("click", handleCountdownListClick);
   document.getElementById("openCalendarModal").addEventListener("click", openCalendarModal);
   document.getElementById("calendarBackdrop").addEventListener("click", closeCalendarModal);
+  document.getElementById("closeCalendar").addEventListener("click", closeCalendarModal);
   document.getElementById("prevMonth").addEventListener("click", () => moveCalendarMonth(-1));
   document.getElementById("nextMonth").addEventListener("click", () => moveCalendarMonth(1));
   document.getElementById("confirmCalendar").addEventListener("click", confirmCalendarSelection);
