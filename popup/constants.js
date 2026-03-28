@@ -1,13 +1,13 @@
 export const QUICK_LINKS = [
   { id: "klas", title: "KLAS", url: "https://klas.kw.ac.kr/" },
-  { id: "kw-home", title: "광운대 홈페이지", url: "https://www.kw.ac.kr/ko/" },
+  { id: "kw-home", title: "광운대<br>홈페이지", url: "https://www.kw.ac.kr/ko/" },
   { id: "e-learning", title: "E-러닝", url: "https://selc.or.kr/lms/main/MainView.do" },
   { id: "k-mooc", title: "K-MOOC", url: "https://www.kmooc.kr/" },
   { id: "webmail", title: "웹메일", url: "https://wmail.kw.ac.kr/" },
   { id: "everytime", title: "에브리타임", url: "https://kw.everytime.kr/" },
   { id: "dining", title: "학식", url: "https://www.kw.ac.kr/ko/life/facility11.jsp" },
   { id: "campus-phone", title: "교내전화번호", url: "https://www.kw.ac.kr/ko/tour/phone.jsp" },
-  { id: "departments", title: "단과대 바로가기", action: "open-departments" }
+  { id: "departments", title: "단과대<br>바로가기", action: "open-departments" }
 ];
 
 export const DEPARTMENT_LINKS = [

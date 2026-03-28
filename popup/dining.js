@@ -41,10 +41,8 @@ export async function loadDiningMenus() {
 }
 
 export function renderMealSection(mealState) {
-  const labelNode = document.getElementById("mealLabel");
   const summaryNode = document.getElementById("mealSummary");
 
-  labelNode.textContent = mealState.focusLabel;
   summaryNode.innerHTML = mealState.entries
     .map(
       (entry) => `
@@ -70,7 +68,7 @@ export function bindDiningOpen() {
 
 function renderMealLines(items) {
   if (!items.length) {
-    return "<span>운영 정보 없음</span>";
+    return "";
   }
 
   const lines = [];
@@ -91,11 +89,11 @@ function parseDiningMenus(html, now) {
   if (!table || targetColumnIndex === -1) {
     return {
       date: formatDate(now),
-      focusLabel: "운영 정보 없음",
+      focusLabel: "",
       entries: [
         {
           name: "오늘 식단",
-          time: "학식 페이지 확인",
+          time: "학식 미운영",
           items: ["오늘 날짜에 해당하는 학식 정보가 없습니다."]
         }
       ]
