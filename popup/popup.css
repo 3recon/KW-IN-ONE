@@ -206,11 +206,6 @@ h2 {
   display: block;
 }
 
-.countdown-item-prefix {
-  font-weight: 400;
-  color: var(--text);
-}
-
 .countdown-item-time {
   font-weight: 400;
   color: var(--accent);

@@ -379,7 +379,7 @@ function formatRemainingMarkup(countdown, now) {
   }
 
   if (diff <= 0) {
-    return `<span class="countdown-item-label">${countdown.label}</span><span class="countdown-item-subline"><span class="countdown-item-prefix">일정이</span> <span class="countdown-item-time">시작되었습니다.</span></span>`;
+    return `<span class="countdown-item-label">${countdown.label}</span><span class="countdown-item-subline"><span class="countdown-item-time">시작되었습니다.</span></span>`;
   }
 
   const totalSeconds = Math.floor(diff / 1000);
@@ -388,7 +388,7 @@ function formatRemainingMarkup(countdown, now) {
   const minutes = Math.floor((totalSeconds % 3600) / 60);
   const seconds = totalSeconds % 60;
 
-  return `<span class="countdown-item-label">${countdown.label}</span><span class="countdown-item-subline"><span class="countdown-item-prefix">까지</span> <span class="countdown-item-time">${days}일 ${hours}시간 ${minutes}분 ${seconds}초</span></span>`;
+  return `<span class="countdown-item-label">${countdown.label}</span><span class="countdown-item-subline"><span class="countdown-item-time">${days}일 ${hours}시간 ${minutes}분 ${seconds}초</span></span>`;
 }
 
 function formatDateTimeLocalValue(date) {
