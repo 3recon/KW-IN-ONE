@@ -78,10 +78,7 @@
           <div class="calendar-header">
             <button id="prevMonth" class="ghost-button" type="button">이전</button>
             <div id="calendarTitle" class="calendar-title"></div>
-            <div class="calendar-header-actions">
-              <button id="closeCalendar" class="ghost-button" type="button">닫기</button>
-              <button id="nextMonth" class="ghost-button" type="button">다음</button>
-            </div>
+            <button id="nextMonth" class="ghost-button" type="button">다음</button>
           </div>
           <div class="calendar-weekdays">
             <span>일</span>
@@ -101,7 +98,10 @@
               <select id="calendarMinute" class="select"></select>
             </div>
           </div>
-          <button id="confirmCalendar" class="primary-button full-width" type="button">확인</button>
+          <div class="calendar-actions">
+            <button id="closeCalendar" class="ghost-button full-width" type="button">닫기</button>
+            <button id="confirmCalendar" class="primary-button full-width" type="button">확인</button>
+          </div>
         </div>
       </section>
     </main>
