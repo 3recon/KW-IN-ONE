@@ -206,6 +206,16 @@ h2 {
   display: block;
 }
 
+.countdown-item-prefix {
+  font-weight: 400;
+  color: var(--text);
+}
+
+.countdown-item-time {
+  font-weight: 400;
+  color: var(--accent);
+}
+
 .countdown-item-actions {
   display: flex;
   flex-shrink: 0;
