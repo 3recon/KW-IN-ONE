@@ -379,7 +379,7 @@ function formatRemainingMarkup(countdown, now) {
   }
 
   if (diff <= 0) {
-    return `<span class="countdown-item-label">${countdown.label}</span><span class="countdown-item-subline"><span class="countdown-item-time">시작되었습니다.</span></span>`;
+    return `<span class="countdown-item-label">${countdown.label}</span><span class="countdown-item-subline"><span class="countdown-item-time">지난 일정입니다.</span></span>`;
   }
 
   const totalSeconds = Math.floor(diff / 1000);
