@@ -41,11 +41,8 @@ export async function loadDiningMenus() {
 }
 
 export function renderMealSection(mealState) {
-  const labelNode = document.getElementById("mealLabel");
   const summaryNode = document.getElementById("mealSummary");
 
-  labelNode.textContent = mealState.focusLabel || "";
-  labelNode.hidden = !mealState.focusLabel;
   summaryNode.innerHTML = mealState.entries
     .map(
       (entry) => `

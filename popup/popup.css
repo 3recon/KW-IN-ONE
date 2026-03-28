@@ -259,17 +259,6 @@ h2 {
   background: linear-gradient(180deg, #fcf9f6 0%, #f1ebe5 100%);
 }
 
-.pill {
-  display: inline-flex;
-  align-items: center;
-  padding: 4px 10px;
-  border-radius: 999px;
-  background: var(--accent-soft);
-  color: var(--accent-strong);
-  font-size: 12px;
-  font-weight: 700;
-}
-
 .meal-summary {
   display: grid;
   gap: 8px;
