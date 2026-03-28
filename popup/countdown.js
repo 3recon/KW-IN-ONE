@@ -114,8 +114,8 @@ async function saveCountdown() {
   });
 
   document.getElementById("countdownStatus").textContent = editingCountdownId
-    ? "시험 일정이 수정되었습니다."
-    : "시험 일정이 저장되었습니다.";
+    ? "일정이 수정되었습니다."
+    : "일정이 저장되었습니다.";
 
   resetCountdownForm();
   renderCountdownList(nextCountdowns);
@@ -147,7 +147,7 @@ async function handleCountdownListClick(event) {
       selected.targetDateTime
     );
     syncCalendarInputs(new Date(selected.targetDateTime));
-    document.getElementById("countdownStatus").textContent = "수정할 시험 일정을 편집 중입니다.";
+    document.getElementById("countdownStatus").textContent = "수정할 일정을 편집 중입니다.";
     document.getElementById("countdownSettings").classList.remove("is-collapsed");
     return;
   }
@@ -301,7 +301,7 @@ function renderCountdownList(countdowns, now = new Date()) {
 
   if (!countdowns.length) {
     container.innerHTML =
-      '<div class="countdown-item-remaining">시험 일정을 등록하면 남은 시간을 표시합니다.</div>';
+      '<div class="countdown-item-remaining">일정을 등록하면 남은 시간을 표시합니다.</div>';
     return;
   }
 
