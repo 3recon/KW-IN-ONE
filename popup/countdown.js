@@ -19,6 +19,7 @@ function bindCountdownEvents() {
   });
 
   document.getElementById("saveCountdown").addEventListener("click", saveCountdown);
+  document.getElementById("cancelCountdown").addEventListener("click", cancelCountdownEditing);
   document.getElementById("countdownList").addEventListener("click", handleCountdownListClick);
   document.getElementById("openCalendarModal").addEventListener("click", openCalendarModal);
   document.getElementById("calendarBackdrop").addEventListener("click", closeCalendarModal);
@@ -334,6 +335,11 @@ function resetCountdownForm() {
   document.getElementById("openCalendarModal").textContent = "날짜와 시간을 선택하세요";
   document.getElementById("countdownStatus").textContent = "";
   syncCalendarInputs(new Date());
+}
+
+function cancelCountdownEditing() {
+  resetCountdownForm();
+  document.getElementById("countdownSettings").classList.add("is-collapsed");
 }
 
 async function getStoredCountdowns() {
