@@ -197,6 +197,7 @@ h2 {
   font-weight: 700;
   flex: 1;
   min-width: 0;
+  word-break: keep-all;
 }
 
 .countdown-item-actions {
