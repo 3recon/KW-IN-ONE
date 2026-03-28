@@ -65,7 +65,6 @@ export async function saveSettings(afterSave) {
   );
 
   await chrome.storage.sync.set({
-    refreshMinutes: DEFAULT_SETTINGS.refreshMinutes,
     selectedNoticeCategories
   });
 

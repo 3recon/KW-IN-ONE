@@ -44,7 +44,6 @@ export const NOTICE_URL =
 export const DINING_URL = "https://www.kw.ac.kr/ko/life/facility11.jsp";
 
 export const DEFAULT_SETTINGS = {
-  refreshMinutes: 30,
   selectedNoticeCategories: ["전체"]
 };
 
