@@ -3,7 +3,7 @@
   "name": "KW IN ONE",
   "description": "광운대학교 학생을 위한 통합 대시보드 크롬 확장 프로그램",
   "version": "0.1.0",
-  "permissions": ["storage", "alarms", "tabs"],
+  "permissions": ["storage", "tabs"],
   "host_permissions": [
     "https://klas.kw.ac.kr/*",
     "https://www.kw.ac.kr/*",
