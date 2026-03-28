@@ -1,13 +1,15 @@
 :root {
   color-scheme: light;
-  --bg: #f3f1ea;
-  --panel: #fffdf8;
-  --panel-strong: #f2ede0;
-  --text: #1f1d18;
-  --muted: #6f6a5d;
-  --line: #ddd3bf;
-  --accent: #8f1d1d;
-  --shadow: 0 12px 32px rgba(74, 58, 35, 0.12);
+  --bg: #f1eeea;
+  --panel: #fcfbf8;
+  --panel-strong: #eee7e1;
+  --text: #241816;
+  --muted: #746762;
+  --line: #d8cfc8;
+  --accent: #8a1601;
+  --accent-strong: #5b0d12;
+  --accent-soft: #e7ddd8;
+  --shadow: 0 16px 36px rgba(91, 13, 18, 0.12);
 }
 
 * {
@@ -20,8 +22,8 @@ body {
   min-height: 760px;
   font-family: "Segoe UI", "Apple SD Gothic Neo", sans-serif;
   background:
-    radial-gradient(circle at top right, rgba(143, 29, 29, 0.14), transparent 32%),
-    linear-gradient(180deg, #f8f5ef 0%, var(--bg) 100%);
+    radial-gradient(circle at top right, rgba(138, 22, 1, 0.1), transparent 28%),
+    linear-gradient(180deg, #f6f3ef 0%, var(--bg) 100%);
   color: var(--text);
 }
 
@@ -32,14 +34,28 @@ body {
 .hero {
   padding: 18px;
   border-radius: 20px;
-  background: linear-gradient(135deg, #fff7ef 0%, #f3e7da 100%);
+  background: linear-gradient(135deg, var(--accent-strong) 0%, var(--accent) 100%);
   box-shadow: var(--shadow);
+  color: #fffaf7;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero::after {
+  content: "";
+  position: absolute;
+  inset: auto -40px -40px auto;
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.18) 0%, transparent 68%);
 }
 
 h1 {
   margin: 0;
   font-size: 28px;
   line-height: 1;
+  letter-spacing: 0.04em;
 }
 
 .panel {
@@ -52,7 +68,7 @@ h1 {
 }
 
 .countdown-panel {
-  background: linear-gradient(180deg, #fff9f1 0%, #f7eee2 100%);
+  background: linear-gradient(180deg, #fbf8f5 0%, #f1ebe5 100%);
 }
 
 .section-header {
@@ -66,6 +82,7 @@ h1 {
 h2 {
   margin: 0;
   font-size: 17px;
+  color: var(--accent-strong);
 }
 
 .muted {
@@ -93,10 +110,10 @@ h2 {
   padding: 12px;
   border: 1px solid var(--line);
   border-radius: 14px;
-  background: linear-gradient(180deg, #fffdf8 0%, #f7f0e6 100%);
+  background: linear-gradient(180deg, #fefdfb 0%, #f3ece6 100%);
   text-decoration: none;
   color: inherit;
-  transition: transform 120ms ease, border-color 120ms ease;
+  transition: transform 120ms ease, border-color 120ms ease, box-shadow 120ms ease;
 }
 
 .link-card-button {
@@ -107,7 +124,8 @@ h2 {
 
 .link-card:hover {
   transform: translateY(-1px);
-  border-color: #b99f7e;
+  border-color: rgba(138, 22, 1, 0.36);
+  box-shadow: 0 10px 20px rgba(138, 22, 1, 0.08);
 }
 
 .link-title {
@@ -140,9 +158,9 @@ h2 {
   margin-bottom: 6px;
   padding: 3px 8px;
   border-radius: 999px;
-  background: var(--panel-strong);
+  background: var(--accent-soft);
   font-size: 11px;
-  color: var(--muted);
+  color: var(--accent-strong);
 }
 
 .notice-link {
@@ -177,7 +195,7 @@ h2 {
   padding: 12px;
   border-radius: 14px;
   border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.7);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.94) 0%, rgba(241, 235, 229, 0.9) 100%);
 }
 
 .countdown-item-main {
@@ -215,7 +233,7 @@ h2 {
 }
 
 .meal-panel {
-  background: linear-gradient(180deg, #fffaf2 0%, #f5ead8 100%);
+  background: linear-gradient(180deg, #fcf9f6 0%, #f1ebe5 100%);
 }
 
 .pill {
@@ -223,8 +241,8 @@ h2 {
   align-items: center;
   padding: 4px 10px;
   border-radius: 999px;
-  background: #fff1df;
-  color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent-strong);
   font-size: 12px;
   font-weight: 700;
 }
@@ -239,8 +257,8 @@ h2 {
 .meal-card {
   padding: 12px;
   border-radius: 14px;
-  background: rgba(255, 255, 255, 0.65);
-  border: 1px solid rgba(185, 159, 126, 0.45);
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(138, 22, 1, 0.16);
 }
 
 .meal-card strong {
@@ -284,13 +302,21 @@ h2 {
 
 .ghost-button:hover,
 .primary-button:hover {
-  border-color: #b99f7e;
+  border-color: rgba(138, 22, 1, 0.4);
 }
 
 .primary-button {
   background: var(--accent);
   color: #fff;
   border-color: var(--accent);
+}
+
+.ghost-button {
+  background: #fdfbf8;
+}
+
+.ghost-button:hover {
+  color: var(--accent-strong);
 }
 
 .full-width {
@@ -318,7 +344,7 @@ h2 {
   padding: 14px;
   border: 1px solid var(--line);
   border-radius: 16px;
-  background: #fffaf2;
+  background: #fbf8f4;
 }
 
 .inline-settings.is-collapsed {
@@ -349,7 +375,7 @@ h2 {
   padding: 10px 12px;
   border: 1px solid var(--line);
   border-radius: 12px;
-  background: #fffaf2;
+  background: #faf7f3;
   font-size: 13px;
 }
 
@@ -373,7 +399,7 @@ h2 {
   padding: 16px;
   border: 1px solid var(--line);
   border-radius: 20px;
-  background: #fffdf8;
+  background: #fcfbf8;
   box-shadow: var(--shadow);
   transform: translate(-50%, -50%);
   overflow: auto;
@@ -393,7 +419,7 @@ h2 {
   padding: 12px 14px;
   border: 1px solid var(--line);
   border-radius: 14px;
-  background: linear-gradient(180deg, #fffdf8 0%, #f7f0e6 100%);
+  background: linear-gradient(180deg, #fefdfb 0%, #f3ece6 100%);
   color: inherit;
   text-decoration: none;
   font-size: 14px;
@@ -401,7 +427,7 @@ h2 {
 }
 
 .department-link:hover {
-  border-color: #b99f7e;
+  border-color: rgba(138, 22, 1, 0.36);
   color: var(--accent);
 }
 
@@ -418,7 +444,7 @@ h2 {
 .calendar-backdrop {
   position: absolute;
   inset: 0;
-  background: rgba(31, 29, 24, 0.22);
+  background: rgba(91, 13, 18, 0.24);
 }
 
 .calendar-dialog {
@@ -430,7 +456,7 @@ h2 {
   padding: 16px;
   border: 1px solid var(--line);
   border-radius: 20px;
-  background: #fffdf8;
+  background: #fcfbf8;
   box-shadow: var(--shadow);
   transform: translate(-50%, -50%);
 }
@@ -477,7 +503,7 @@ h2 {
 
 .calendar-day.is-selected {
   border-color: var(--accent);
-  background: #f7e7da;
+  background: var(--accent-soft);
   color: var(--accent);
   font-weight: 700;
 }
