@@ -95,7 +95,7 @@ function parseDiningMenus(html, now) {
       entries: [
         {
           name: "오늘 식단",
-          time: "학식 페이지 확인",
+          time: "학식 미운영",
           items: ["오늘 날짜에 해당하는 학식 정보가 없습니다."]
         }
       ]
