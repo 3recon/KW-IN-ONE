@@ -16,8 +16,8 @@
 
 body {
   margin: 0;
-  width: 380px;
-  min-height: 680px;
+  width: 430px;
+  min-height: 760px;
   font-family: "Segoe UI", "Apple SD Gothic Neo", sans-serif;
   background:
     radial-gradient(circle at top right, rgba(143, 29, 29, 0.14), transparent 32%),
