@@ -179,6 +179,13 @@ h2 {
   gap: 4px;
 }
 
+.countdown-item-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
 .countdown-item-date {
   font-size: 12px;
   color: var(--muted);
