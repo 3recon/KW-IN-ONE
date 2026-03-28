@@ -388,7 +388,7 @@ function formatRemainingMarkup(countdown, now) {
   const minutes = Math.floor((totalSeconds % 3600) / 60);
   const seconds = totalSeconds % 60;
 
-  return `${countdown.label}까지<br>${days}일 ${hours}시간 ${minutes}분 ${seconds}초`;
+  return `${countdown.label} 일정까지<br>${days}일 ${hours}시간 ${minutes}분 ${seconds}초`;
 }
 
 function formatDateTimeLocalValue(date) {
