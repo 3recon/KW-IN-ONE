@@ -166,6 +166,38 @@ h2 {
   font-weight: 700;
 }
 
+.countdown-list {
+  display: grid;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.countdown-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.countdown-item-main {
+  display: grid;
+  gap: 4px;
+}
+
+.countdown-item-date {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.countdown-item-actions {
+  display: flex;
+  gap: 8px;
+}
+
 .meal-panel {
   background: linear-gradient(180deg, #fffaf2 0%, #f5ead8 100%);
 }
