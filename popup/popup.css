@@ -342,6 +342,23 @@ h2 {
   color: var(--accent-strong);
 }
 
+.settings-chip-button {
+  padding: 10px 16px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1;
+  box-shadow: inset 0 0 0 1px rgba(138, 22, 1, 0.08);
+}
+
+.settings-chip-button:hover {
+  background: #e2d4ce;
+  border-color: transparent;
+}
+
 .full-width {
   width: 100%;
   margin-top: 12px;
