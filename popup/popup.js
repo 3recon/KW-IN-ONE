@@ -320,7 +320,7 @@ function parseKwNotices(html) {
       category: parsedTitle.category,
       title: parsedTitle.title,
       url: new URL(href, NOTICE_URL).toString(),
-      publishedAt: extractNearbyDate(anchor) || "작성일 정보 없음"
+      publishedAt: extractNearbyDate(anchor) || "수정일 정보 없음"
     });
 
     seen.add(href);
@@ -376,6 +376,12 @@ function extractNearbyDate(anchor) {
   }
 
   for (const text of candidateTexts) {
+    const modifiedMatch = text.match(/수정일\s*(\d{4}[.-]\d{2}[.-]\d{2})/);
+
+    if (modifiedMatch) {
+      return modifiedMatch[1];
+    }
+
     const dateMatch = text.match(/\d{4}[.-]\d{2}[.-]\d{2}/);
 
     if (dateMatch) {
