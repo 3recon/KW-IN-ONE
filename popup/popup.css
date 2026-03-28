@@ -348,7 +348,7 @@ h2 {
   border-radius: 999px;
   background: var(--accent-soft);
   color: var(--accent-strong);
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
   line-height: 1;
   box-shadow: inset 0 0 0 1px rgba(138, 22, 1, 0.08);
