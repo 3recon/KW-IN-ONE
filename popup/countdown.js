@@ -38,8 +38,8 @@ function initializeCalendarControls() {
     return `<option value="${value}">${value}</option>`;
   }).join("");
 
-  minuteSelect.innerHTML = Array.from({ length: 60 }, (_, minute) => {
-    const value = String(minute).padStart(2, "0");
+  minuteSelect.innerHTML = Array.from({ length: 12 }, (_, index) => {
+    const value = String(index * 5).padStart(2, "0");
     return `<option value="${value}">${value}</option>`;
   }).join("");
 
@@ -215,7 +215,7 @@ function syncCalendarInputs(date) {
   calendarSelectedDate = new Date(date);
   calendarCursorDate = new Date(date.getFullYear(), date.getMonth(), 1);
   document.getElementById("calendarHour").value = String(date.getHours()).padStart(2, "0");
-  document.getElementById("calendarMinute").value = String(date.getMinutes()).padStart(2, "0");
+  document.getElementById("calendarMinute").value = String(roundMinutesToFive(date.getMinutes())).padStart(2, "0");
   renderCalendar();
 }
 
@@ -402,4 +402,8 @@ function formatDateTimeLocalValue(date) {
 
 function formatCalendarButtonText(value) {
   return formatDateTime(value);
+}
+
+function roundMinutesToFive(minutes) {
+  return Math.min(55, Math.round(minutes / 5) * 5);
 }
