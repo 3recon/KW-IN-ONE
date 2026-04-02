@@ -1,5 +1,6 @@
 const COUNTDOWN_STORAGE_KEY = "examCountdowns";
 const LEGACY_COUNTDOWN_STORAGE_KEY = "examCountdown";
+const COUNTDOWN_INITIALIZED_KEY = "examCountdownsInitialized";
 const EMPTY_MEAL_GAP = 182;
 
 let countdownTimerId = null;
@@ -72,8 +73,19 @@ async function migrateLegacyCountdown() {
 }
 
 async function loadCountdowns() {
-  const stored = await chrome.storage.sync.get(COUNTDOWN_STORAGE_KEY);
-  const countdowns = stored[COUNTDOWN_STORAGE_KEY] || [];
+  const stored = await chrome.storage.sync.get([
+    COUNTDOWN_STORAGE_KEY,
+    COUNTDOWN_INITIALIZED_KEY
+  ]);
+  let countdowns = stored[COUNTDOWN_STORAGE_KEY] || [];
+
+  if (!stored[COUNTDOWN_INITIALIZED_KEY] && !countdowns.length) {
+    countdowns = createDefaultCountdowns();
+    await chrome.storage.sync.set({
+      [COUNTDOWN_STORAGE_KEY]: countdowns,
+      [COUNTDOWN_INITIALIZED_KEY]: true
+    });
+  }
 
   if (!countdowns.length) {
     stopCountdownTimer();
@@ -408,6 +420,26 @@ async function getStoredCountdowns() {
 
 function createCountdownId() {
   return `${Date.now()}-${Math.random().toString(16).slice(2, 8)}`;
+}
+
+function createDefaultCountdowns() {
+  return [
+    createDefaultCountdown("중간고사 예시", 7, 9, 0),
+    createDefaultCountdown("과제 마감 예시", 14, 23, 59)
+  ];
+}
+
+function createDefaultCountdown(label, daysToAdd, hour, minute) {
+  const target = new Date();
+  target.setSeconds(0, 0);
+  target.setDate(target.getDate() + daysToAdd);
+  target.setHours(hour, minute, 0, 0);
+
+  return {
+    id: createCountdownId(),
+    label,
+    targetDateTime: formatDateTimeLocalValue(target)
+  };
 }
 
 function formatDateTime(value) {
