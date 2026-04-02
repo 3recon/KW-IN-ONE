@@ -1,5 +1,6 @@
 const COUNTDOWN_STORAGE_KEY = "examCountdowns";
 const LEGACY_COUNTDOWN_STORAGE_KEY = "examCountdown";
+const EMPTY_MEAL_GAP = 182;
 
 let countdownTimerId = null;
 let editingCountdownId = null;
@@ -77,6 +78,7 @@ async function loadCountdowns() {
   if (!countdowns.length) {
     stopCountdownTimer();
     renderCountdownList([]);
+    updateMealPanelGap(0);
     return;
   }
 
@@ -298,8 +300,10 @@ function updateCountdown(countdowns) {
 
 function renderCountdownList(countdowns, now = new Date()) {
   const container = document.getElementById("countdownList");
+  const panel = document.querySelector(".countdown-panel");
 
   if (!countdowns.length) {
+    panel?.classList.add("is-empty");
     container.innerHTML =
       '<div class="countdown-item-remaining">일정을 등록하면 남은 시간을 표시합니다.</div>';
     return;
@@ -308,6 +312,8 @@ function renderCountdownList(countdowns, now = new Date()) {
   const sorted = [...countdowns].sort(
     (left, right) => new Date(left.targetDateTime).getTime() - new Date(right.targetDateTime).getTime()
   );
+
+  panel?.classList.toggle("is-empty", sorted.length < 3);
 
   container.innerHTML = sorted
     .map(
@@ -327,6 +333,8 @@ function renderCountdownList(countdowns, now = new Date()) {
       `
     )
     .join("");
+
+  updateMealPanelGap(sorted.length);
 }
 
 function resetCountdownForm() {
@@ -341,6 +349,56 @@ function resetCountdownForm() {
 function cancelCountdownEditing() {
   resetCountdownForm();
   document.getElementById("countdownSettings").classList.add("is-collapsed");
+}
+
+function updateMealPanelGap(count) {
+  const panel = document.querySelector(".countdown-panel");
+  const mealPanel = document.querySelector(".meal-panel");
+
+  if (!panel || !mealPanel) {
+    return;
+  }
+
+  if (count >= 3) {
+    mealPanel.style.setProperty("--countdown-gap", "0px");
+    return;
+  }
+
+  const emptyHeight = measureEmptyCountdownPanelHeight(panel);
+  const growth = Math.max(0, panel.offsetHeight - emptyHeight);
+  const gap = Math.max(0, EMPTY_MEAL_GAP - growth);
+
+  mealPanel.style.setProperty("--countdown-gap", `${gap}px`);
+}
+
+function measureEmptyCountdownPanelHeight(panel) {
+  const clone = panel.cloneNode(true);
+  const cloneList = clone.querySelector("#countdownList");
+  const cloneSettings = clone.querySelector("#countdownSettings");
+
+  clone.classList.add("is-empty");
+  clone.style.position = "absolute";
+  clone.style.left = "-9999px";
+  clone.style.top = "0";
+  clone.style.visibility = "hidden";
+  clone.style.pointerEvents = "none";
+  clone.style.width = `${panel.offsetWidth}px`;
+  clone.style.marginTop = "0";
+
+  if (cloneList) {
+    cloneList.innerHTML =
+      '<div class="countdown-item-remaining">?쇱젙???깅줉?섎㈃ ?⑥? ?쒓컙???쒖떆?⑸땲??</div>';
+  }
+
+  if (cloneSettings) {
+    cloneSettings.remove();
+  }
+
+  document.body.appendChild(clone);
+  const height = clone.offsetHeight;
+  clone.remove();
+
+  return height;
 }
 
 async function getStoredCountdowns() {

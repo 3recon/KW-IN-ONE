@@ -22,7 +22,7 @@ export async function loadLatestNotices() {
         {
           source: "광운대 공지",
           category: "설정",
-          title: "선택한 카테고리에 해당하는 공지가 없습니다.",
+          title: "선택한 카테고리에 해당하는 최신 공지가 없습니다.",
           url: NOTICE_URL,
           publishedAt: "필터 결과"
         }
